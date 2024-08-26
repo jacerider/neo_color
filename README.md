@@ -6,7 +6,7 @@ Provide color pallets and shades for use within the Neo themes.
 REQUIREMENTS
 ------------
 
-This module requires jacerider/neo_tooltip and Drupal core.
+This module requires Drupal core.
 
 INSTALLATION
 ------------

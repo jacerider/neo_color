@@ -114,10 +114,12 @@ final class SchemeWidget extends OptionsButtonsWidget {
           '#theme' => 'neo_scheme_swatch',
           '#neo_scheme' => $scheme,
         ];
-        $tooltip = new Tooltip($scheme->label());
-        $tooltip->setPlacementToBottom();
-        $tooltip->setTriggerToNearestFocusableElement();
-        $tooltip->applyTo($build);
+        if (class_exists('Drupal\neo_tooltip\Tooltip')) {
+          $tooltip = new Tooltip($scheme->label());
+          $tooltip->setPlacementToBottom();
+          $tooltip->setTriggerToNearestFocusableElement();
+          $tooltip->applyTo($build);
+        }
         $options[$scheme->id()] = $this->renderer->render($build);
       }
       $this->options = $options;
