@@ -6,7 +6,7 @@ Provide color pallets and shades for use within the Neo themes.
 REQUIREMENTS
 ------------
 
-This module requires Drupal core.
+This module requires jacerider/neo_build and Drupal core.
 
 INSTALLATION
 ------------
