@@ -1,0 +1,23 @@
+{
+  "name": "jacerider/neo_color",
+  "description": "Provide color pallets and shades for use within the Neo themes.",
+  "type": "drupal-module",
+  "license": "proprietary",
+  "homepage": "https://github.com/jacerider/neo_color",
+  "authors": [
+    {
+      "name": "Cyle Carlson (JaceRider)",
+      "email": "jacerider@gmail.com",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/jacerider/neo_color/issues",
+    "source": "https://github.com/jacerider/neo_color"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3",
+    "jacerider/neo_tooltip": "^1"
+  }
+}

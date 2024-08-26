@@ -1,0 +1,13 @@
+uuid: 2f0c20d7-c8ee-4e88-8e48-5121af839839
+langcode: en
+status: true
+dependencies: {  }
+id: primary_solid_dark
+label: 'Primary Solid Dark'
+dark: true
+base: primary
+primary: primary
+secondary: primary
+accent: secondary
+weight: -5
+colorize: 1

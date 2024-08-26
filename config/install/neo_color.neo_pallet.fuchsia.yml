@@ -1,0 +1,45 @@
+uuid: 7ce91d6f-1113-4531-b310-da6877401833
+langcode: en
+status: false
+dependencies: {  }
+id: fuchsia
+label: Fuchsia
+specific: true
+shades:
+  50:
+    color: '#fdf4ff'
+    dark: '1'
+  100:
+    color: '#fae8ff'
+    dark: '1'
+  200:
+    color: '#f5d0fe'
+    dark: '1'
+  300:
+    color: '#f0abfc'
+    dark: '1'
+  400:
+    color: '#e879f9'
+    dark: '1'
+  500:
+    color: '#d946ef'
+    dark: '0'
+  600:
+    color: '#c026d3'
+    dark: '0'
+  700:
+    color: '#a21caf'
+    dark: '0'
+  800:
+    color: '#86198f'
+    dark: '0'
+  900:
+    color: '#701a75'
+    dark: '0'
+  950:
+    color: '#4a044e'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

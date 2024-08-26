@@ -1,0 +1,45 @@
+uuid: b5bbdbb2-08ae-4749-942a-d0a6c37a5667
+langcode: en
+status: false
+dependencies: {  }
+id: cyan
+label: Cyan
+specific: true
+shades:
+  50:
+    color: '#ecfeff'
+    dark: '1'
+  100:
+    color: '#cffafe'
+    dark: '1'
+  200:
+    color: '#a5f3fc'
+    dark: '1'
+  300:
+    color: '#67e8f9'
+    dark: '1'
+  400:
+    color: '#22d3ee'
+    dark: '1'
+  500:
+    color: '#06b6d4'
+    dark: '1'
+  600:
+    color: '#0891b2'
+    dark: '0'
+  700:
+    color: '#0e7490'
+    dark: '0'
+  800:
+    color: '#155e75'
+    dark: '0'
+  900:
+    color: '#164e63'
+    dark: '0'
+  950:
+    color: '#083344'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

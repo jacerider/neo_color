@@ -1,0 +1,13 @@
+uuid: e90309a8-d67d-41f9-8bc9-7b35a8453c71
+langcode: en
+status: true
+dependencies: {  }
+id: primary_solid
+label: 'Primary Solid'
+dark: false
+base: primary
+primary: primary
+secondary: primary
+accent: secondary
+weight: -6
+colorize: 1

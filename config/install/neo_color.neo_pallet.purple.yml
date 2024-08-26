@@ -1,0 +1,45 @@
+uuid: 9d0fda8d-9908-4e14-a884-a452d0212658
+langcode: en
+status: false
+dependencies: {  }
+id: purple
+label: Purple
+specific: false
+shades:
+  50:
+    color: '#faf5ff'
+    dark: '1'
+  100:
+    color: '#f3e8ff'
+    dark: '1'
+  200:
+    color: '#e9d5ff'
+    dark: '1'
+  300:
+    color: '#d8b4fe'
+    dark: '1'
+  400:
+    color: '#c084fc'
+    dark: '1'
+  500:
+    color: '#a855f7'
+    dark: '0'
+  600:
+    color: '#9333ea'
+    dark: '0'
+  700:
+    color: '#7e22ce'
+    dark: '0'
+  800:
+    color: '#6b21a8'
+    dark: '0'
+  900:
+    color: '#581c87'
+    dark: '0'
+  950:
+    color: '#3b0764'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

@@ -1,0 +1,45 @@
+uuid: bc0df168-9748-4170-810c-d938c913b7fa
+langcode: en
+status: false
+dependencies: {  }
+id: lime
+label: Lime
+specific: true
+shades:
+  50:
+    color: '#f7fee7'
+    dark: '1'
+  100:
+    color: '#ecfccb'
+    dark: '1'
+  200:
+    color: '#d9f99d'
+    dark: '1'
+  300:
+    color: '#bef264'
+    dark: '1'
+  400:
+    color: '#a3e635'
+    dark: '1'
+  500:
+    color: '#84cc16'
+    dark: '1'
+  600:
+    color: '#65a30d'
+    dark: '0'
+  700:
+    color: '#4d7c0f'
+    dark: '0'
+  800:
+    color: '#3f6212'
+    dark: '0'
+  900:
+    color: '#365314'
+    dark: '0'
+  950:
+    color: '#1a2e05'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

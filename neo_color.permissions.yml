@@ -1,0 +1,5 @@
+administer neo_pallet:
+  title: 'Administer pallet'
+
+administer neo_scheme:
+  title: 'Administer scheme'

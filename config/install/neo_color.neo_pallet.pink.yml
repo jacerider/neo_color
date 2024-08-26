@@ -1,0 +1,45 @@
+uuid: b79f7d2a-7c60-4bfe-bc0a-28f475f34b11
+langcode: en
+status: false
+dependencies: {  }
+id: pink
+label: Pink
+specific: true
+shades:
+  50:
+    color: '#fdf2f8'
+    dark: '1'
+  100:
+    color: '#fce7f3'
+    dark: '1'
+  200:
+    color: '#fbcfe8'
+    dark: '1'
+  300:
+    color: '#f9a8d4'
+    dark: '1'
+  400:
+    color: '#f472b6'
+    dark: '1'
+  500:
+    color: '#ec4899'
+    dark: '0'
+  600:
+    color: '#db2777'
+    dark: '0'
+  700:
+    color: '#be185d'
+    dark: '0'
+  800:
+    color: '#9d174d'
+    dark: '0'
+  900:
+    color: '#831843'
+    dark: '0'
+  950:
+    color: '#500724'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

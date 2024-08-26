@@ -1,0 +1,45 @@
+uuid: f6ea5245-5aef-4db3-b026-14f1e2d6ef07
+langcode: en
+status: false
+dependencies: {  }
+id: rose
+label: Rose
+specific: true
+shades:
+  50:
+    color: '#fff1f2'
+    dark: '1'
+  100:
+    color: '#ffe4e6'
+    dark: '1'
+  200:
+    color: '#fecdd3'
+    dark: '1'
+  300:
+    color: '#fda4af'
+    dark: '1'
+  400:
+    color: '#fb7185'
+    dark: '1'
+  500:
+    color: '#f43f5e'
+    dark: '0'
+  600:
+    color: '#e11d48'
+    dark: '0'
+  700:
+    color: '#be123c'
+    dark: '0'
+  800:
+    color: '#9f1239'
+    dark: '0'
+  900:
+    color: '#881337'
+    dark: '0'
+  950:
+    color: '#4c0519'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

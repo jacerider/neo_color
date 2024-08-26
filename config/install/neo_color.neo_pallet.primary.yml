@@ -1,0 +1,45 @@
+uuid: d6d7efc7-938d-4726-a1c0-478a933face1
+langcode: en
+status: true
+dependencies: {  }
+id: primary
+label: Primary
+specific: false
+shades:
+  50:
+    color: '#f9fbff'
+    dark: '1'
+  100:
+    color: '#f2f7ff'
+    dark: '1'
+  200:
+    color: '#e1ecfe'
+    dark: '1'
+  300:
+    color: '#c2d9fd'
+    dark: '1'
+  400:
+    color: '#84b2fc'
+    dark: '1'
+  500:
+    color: '#4188fa'
+    dark: '0'
+  600:
+    color: '#346dc8'
+    dark: '0'
+  700:
+    color: '#275296'
+    dark: '0'
+  800:
+    color: '#1a3664'
+    dark: '0'
+  900:
+    color: '#0d1b32'
+    dark: '0'
+  950:
+    color: '#070e19'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

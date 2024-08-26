@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Neo | Color module.
+ */
+
+use Drupal\neo_color\PalletInterface;
+use Drupal\neo_color\SchemeInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function neo_color_theme(): array {
+  return [
+    'neo_pallet_preview' => [
+      'variables' => ['neo_pallet' => NULL],
+    ],
+    'neo_pallet_swatches' => [
+      'variables' => ['neo_pallet' => NULL],
+    ],
+    'neo_scheme_preview' => [
+      'variables' => ['neo_scheme' => NULL],
+    ],
+    'neo_scheme_swatch' => [
+      'variables' => ['neo_scheme' => NULL],
+    ],
+  ];
+}
+
+/**
+ * Implements template_preprocess().
+ */
+function template_preprocess_neo_pallet_preview(&$variables) {
+  $pallet = $variables['neo_pallet'];
+  if ($pallet instanceof PalletInterface) {
+    $shade = $pallet->getShade(500);
+    $variables['hex'] = $shade->getHex();
+    $variables['content_hex'] = $shade->getContentHex();
+    $variables['rgb'] = implode(', ', $shade->getRgb());
+    $hsl = $shade->getHsl();
+    $variables['hsl'] = 'hsl(' . $hsl[0] . ', ' . $hsl[1] . '%, ' . $hsl[2] . '%)';
+    $variables['shades'] = $pallet->getShades();
+  }
+}
+
+/**
+ * Implements template_preprocess().
+ */
+function template_preprocess_neo_pallet_swatches(&$variables) {
+  $pallet = $variables['neo_pallet'];
+  if ($pallet instanceof PalletInterface) {
+    $variables['shades'] = $pallet->getShades();
+  }
+}
+
+/**
+ * Implements template_preprocess().
+ */
+function template_preprocess_neo_scheme_preview(&$variables) {
+  /** @var \Drupal\neo_color\SchemeInterface $scheme */
+  $scheme = $variables['neo_scheme'];
+  $variables['dark'] = $scheme->get('dark');
+  $variables['colorize'] = $scheme->get('colorize');
+  if ($scheme instanceof SchemeInterface) {
+    $variables['selector'] = $scheme->getSelector();
+    $variables['css'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'style',
+      '#value' => $scheme->getCss(),
+      '#attributes' => [
+        'neo-scheme' => '',
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements template_preprocess().
+ */
+function template_preprocess_neo_scheme_swatch(&$variables) {
+  /** @var \Drupal\neo_color\SchemeInterface $scheme */
+  $scheme = $variables['neo_scheme'];
+  $variables['dark'] = $scheme->get('dark');
+  $variables['colorize'] = $scheme->get('colorize');
+  if ($scheme instanceof SchemeInterface) {
+    $variables['selector'] = $scheme->getSelector();
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function neo_color_field_formatter_info_alter(&$info) {
+  $info['entity_reference_entity_id']['field_types'][] = 'neo_scheme';
+  $info['entity_reference_entity_view']['field_types'][] = 'neo_scheme';
+  $info['entity_reference_label']['field_types'][] = 'neo_scheme';
+  $info['neo_entity_attribute']['field_types'][] = 'neo_scheme';
+}

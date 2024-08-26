@@ -1,0 +1,45 @@
+uuid: 04877929-d744-4d7a-8900-63de06663b5d
+langcode: en
+status: true
+dependencies: {  }
+id: alert
+label: Alert
+specific: false
+shades:
+  50:
+    color: '#faebe9'
+    dark: '1'
+  100:
+    color: '#f4d6d3'
+    dark: '1'
+  200:
+    color: '#eaada8'
+    dark: '1'
+  300:
+    color: '#df857c'
+    dark: '1'
+  400:
+    color: '#d55c51'
+    dark: '0'
+  500:
+    color: '#ca3325'
+    dark: '0'
+  600:
+    color: '#a2291e'
+    dark: '0'
+  700:
+    color: '#791f16'
+    dark: '0'
+  800:
+    color: '#51140f'
+    dark: '0'
+  900:
+    color: '#280a07'
+    dark: '0'
+  950:
+    color: '#140504'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

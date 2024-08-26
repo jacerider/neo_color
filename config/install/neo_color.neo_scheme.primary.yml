@@ -1,0 +1,12 @@
+uuid: d31cdb2b-7349-4a1b-a855-81bca032a952
+langcode: en
+status: true
+dependencies: {  }
+id: primary
+label: Primary
+dark: false
+base: base
+primary: primary
+secondary: primary
+accent: secondary
+weight: -8

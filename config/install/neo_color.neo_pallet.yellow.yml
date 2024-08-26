@@ -1,0 +1,45 @@
+uuid: f28ae5d3-163d-487b-8d3a-996d0700e1d8
+langcode: en
+status: false
+dependencies: {  }
+id: yellow
+label: Yellow
+specific: true
+shades:
+  50:
+    color: '#fefce8'
+    dark: '1'
+  100:
+    color: '#fef9c3'
+    dark: '1'
+  200:
+    color: '#fef08a'
+    dark: '1'
+  300:
+    color: '#fde047'
+    dark: '1'
+  400:
+    color: '#facc15'
+    dark: '1'
+  500:
+    color: '#eab308'
+    dark: '1'
+  600:
+    color: '#ca8a04'
+    dark: '0'
+  700:
+    color: '#a16207'
+    dark: '0'
+  800:
+    color: '#854d0e'
+    dark: '0'
+  900:
+    color: '#713f12'
+    dark: '0'
+  950:
+    color: '#422006'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

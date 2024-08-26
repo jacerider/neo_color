@@ -1,0 +1,45 @@
+uuid: f07bd964-ede0-4724-9152-1cf9df57c452
+langcode: en
+status: false
+dependencies: {  }
+id: indigo
+label: Indigo
+specific: true
+shades:
+  50:
+    color: '#eef2ff'
+    dark: '1'
+  100:
+    color: '#e0e7ff'
+    dark: '1'
+  200:
+    color: '#c7d2fe'
+    dark: '1'
+  300:
+    color: '#a5b4fc'
+    dark: '1'
+  400:
+    color: '#818cf8'
+    dark: '1'
+  500:
+    color: '#6366f1'
+    dark: '0'
+  600:
+    color: '#4f46e5'
+    dark: '0'
+  700:
+    color: '#4338ca'
+    dark: '0'
+  800:
+    color: '#3730a3'
+    dark: '0'
+  900:
+    color: '#312e81'
+    dark: '0'
+  950:
+    color: '#1e1b4b'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

@@ -1,0 +1,45 @@
+uuid: f5f2874f-14ae-4b27-a0b9-f4b0a0e1ee68
+langcode: en
+status: false
+dependencies: {  }
+id: emerald
+label: Emerald
+specific: true
+shades:
+  50:
+    color: '#ecfdf5'
+    dark: '1'
+  100:
+    color: '#d1fae5'
+    dark: '1'
+  200:
+    color: '#a7f3d0'
+    dark: '1'
+  300:
+    color: '#6ee7b7'
+    dark: '1'
+  400:
+    color: '#34d399'
+    dark: '1'
+  500:
+    color: '#10b981'
+    dark: '1'
+  600:
+    color: '#059669'
+    dark: '0'
+  700:
+    color: '#047857'
+    dark: '0'
+  800:
+    color: '#065f46'
+    dark: '0'
+  900:
+    color: '#064e3b'
+    dark: '0'
+  950:
+    color: '#022c22'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

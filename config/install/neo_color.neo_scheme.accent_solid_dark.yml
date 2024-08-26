@@ -1,0 +1,13 @@
+uuid: 03ff81fc-ce4a-46ca-ade8-c13fb7d1e47b
+langcode: en
+status: true
+dependencies: {  }
+id: accent_solid_dark
+label: 'Accent Solid Dark'
+dark: true
+base: accent
+primary: accent
+secondary: accent
+accent: primary
+weight: 3
+colorize: 1

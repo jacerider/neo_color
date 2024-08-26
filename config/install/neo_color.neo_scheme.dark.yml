@@ -1,0 +1,12 @@
+uuid: 81f1a0a1-a8c2-4fad-91b4-ccc4f5fd07f3
+langcode: en
+status: true
+dependencies: {  }
+id: dark
+label: 'Dark'
+dark: true
+base: base
+primary: primary
+secondary: secondary
+accent: accent
+weight: -9

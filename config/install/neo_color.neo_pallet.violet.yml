@@ -1,0 +1,45 @@
+uuid: 85961b47-3cb5-4048-8684-e416534afe9d
+langcode: en
+status: false
+dependencies: {  }
+id: violet
+label: Violet
+specific: true
+shades:
+  50:
+    color: '#f5f3ff'
+    dark: '1'
+  100:
+    color: '#ede9fe'
+    dark: '1'
+  200:
+    color: '#ddd6fe'
+    dark: '1'
+  300:
+    color: '#c4b5fd'
+    dark: '1'
+  400:
+    color: '#a78bfa'
+    dark: '1'
+  500:
+    color: '#8b5cf6'
+    dark: '0'
+  600:
+    color: '#7c3aed'
+    dark: '0'
+  700:
+    color: '#6d28d9'
+    dark: '0'
+  800:
+    color: '#5b21b6'
+    dark: '0'
+  900:
+    color: '#4c1d95'
+    dark: '0'
+  950:
+    color: '#2e1065'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

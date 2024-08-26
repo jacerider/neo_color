@@ -1,0 +1,13 @@
+uuid: 6826c3f2-a931-41f5-a982-e64c95cb7865
+langcode: en
+status: true
+dependencies: {  }
+id: accent_solid
+label: 'Accent Solid'
+dark: false
+base: accent
+primary: accent
+secondary: accent
+accent: primary
+weight: 2
+colorize: 1

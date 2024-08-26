@@ -1,0 +1,71 @@
+entity.neo_pallet.collection:
+  path: '/admin/config/neo/pallet'
+  defaults:
+    _entity_list: 'neo_pallet'
+    _title: 'Color Pallets'
+  requirements:
+    _permission: 'administer neo_pallet'
+
+entity.neo_pallet.add_form:
+  path: '/admin/config/neo/pallet/add'
+  defaults:
+    _entity_form: 'neo_pallet.add'
+    _title: 'Add a pallet'
+  requirements:
+    _entity_create_access: 'neo_pallet'
+
+entity.neo_pallet.edit_form:
+  path: '/admin/config/neo/pallet/{neo_pallet}'
+  defaults:
+    _entity_form: 'neo_pallet.edit'
+    _title: 'Edit a pallet'
+  requirements:
+    _permission: 'administer neo_pallet'
+
+entity.neo_pallet.duplicate_form:
+  path: '/admin/config/neo/pallet/{neo_pallet}/duplicate'
+  defaults:
+    _entity_form: 'neo_pallet.duplicate'
+    _title: 'Duplicate pallet'
+  requirements:
+    _permission: 'administer neo_pallet'
+
+entity.neo_pallet.delete_form:
+  path: '/admin/config/neo/pallet/{neo_pallet}/delete'
+  defaults:
+    _entity_form: 'neo_pallet.delete'
+    _title: 'Delete a pallet'
+  requirements:
+    _permission: 'administer neo_pallet'
+
+entity.neo_scheme.collection:
+  path: '/admin/config/neo/scheme'
+  defaults:
+    _entity_list: 'neo_scheme'
+    _title: 'Color Schemes'
+  requirements:
+    _permission: 'administer neo_scheme'
+
+entity.neo_scheme.add_form:
+  path: '/admin/config/neo/scheme/add'
+  defaults:
+    _entity_form: 'neo_scheme.add'
+    _title: 'Add a scheme'
+  requirements:
+    _permission: 'administer neo_scheme'
+
+entity.neo_scheme.edit_form:
+  path: '/admin/config/neo/scheme/{neo_scheme}'
+  defaults:
+    _entity_form: 'neo_scheme.edit'
+    _title: 'Edit a scheme'
+  requirements:
+    _permission: 'administer neo_scheme'
+
+entity.neo_scheme.delete_form:
+  path: '/admin/config/neo/scheme/{neo_scheme}/delete'
+  defaults:
+    _entity_form: 'neo_scheme.delete'
+    _title: 'Delete a scheme'
+  requirements:
+    _permission: 'administer neo_scheme'

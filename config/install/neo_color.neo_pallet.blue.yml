@@ -1,0 +1,45 @@
+uuid: 51bcc5fb-c510-405f-8b64-067f44bc648e
+langcode: en
+status: false
+dependencies: {  }
+id: blue
+label: Blue
+specific: true
+shades:
+  50:
+    color: '#eff6ff'
+    dark: '1'
+  100:
+    color: '#dbeafe'
+    dark: '1'
+  200:
+    color: '#bfdbfe'
+    dark: '1'
+  300:
+    color: '#93c5fd'
+    dark: '1'
+  400:
+    color: '#60a5fa'
+    dark: '1'
+  500:
+    color: '#3b82f6'
+    dark: '0'
+  600:
+    color: '#2563eb'
+    dark: '0'
+  700:
+    color: '#1d4ed8'
+    dark: '0'
+  800:
+    color: '#1e40af'
+    dark: '0'
+  900:
+    color: '#1e3a8a'
+    dark: '0'
+  950:
+    color: '#172554'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

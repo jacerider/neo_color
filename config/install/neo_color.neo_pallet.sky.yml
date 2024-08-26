@@ -1,0 +1,45 @@
+uuid: 40a53b01-f2b9-471f-beb6-3b95467469a3
+langcode: en
+status: false
+dependencies: {  }
+id: sky
+label: Sky
+specific: true
+shades:
+  50:
+    color: '#f0f9ff'
+    dark: '1'
+  100:
+    color: '#e0f2fe'
+    dark: '1'
+  200:
+    color: '#bae6fd'
+    dark: '1'
+  300:
+    color: '#7dd3fc'
+    dark: '1'
+  400:
+    color: '#38bdf8'
+    dark: '1'
+  500:
+    color: '#0ea5e9'
+    dark: '1'
+  600:
+    color: '#0284c7'
+    dark: '0'
+  700:
+    color: '#0369a1'
+    dark: '0'
+  800:
+    color: '#075985'
+    dark: '0'
+  900:
+    color: '#0c4a6e'
+    dark: '0'
+  950:
+    color: '#082f49'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

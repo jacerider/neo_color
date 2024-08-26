@@ -1,0 +1,12 @@
+uuid: 9168457b-6170-41e4-83fa-da731ed5280a
+langcode: en
+status: true
+dependencies: {  }
+id: default
+label: Default
+dark: false
+base: base
+primary: primary
+secondary: secondary
+accent: accent
+weight: -10

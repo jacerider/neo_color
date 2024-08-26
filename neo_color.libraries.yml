@@ -1,0 +1,8 @@
+color:
+  version: VERSION
+  neo: { group: contrib }
+  js:
+    src/js/neo-color.ts: {}
+  dependencies:
+    - core/drupal
+    - neo/library.chroma

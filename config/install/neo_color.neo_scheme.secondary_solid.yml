@@ -1,0 +1,13 @@
+uuid: 92ce6611-bcec-418c-bdfc-4692a9d8861c
+langcode: en
+status: true
+dependencies: {  }
+id: secondary_solid
+label: 'Secondary Solid'
+dark: false
+base: secondary
+primary: secondary
+secondary: secondary
+accent: primary
+weight: -2
+colorize: 1

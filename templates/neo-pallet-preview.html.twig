@@ -1,0 +1,38 @@
+<div class="neo-pallet-preview card p-6 grid grid-cols-2">
+  <div class="neo-pallet-preview--first flex items-center">
+    <div class="neo-pallet-preview--swatch-primary neo-pallet-preview--500-swatch neo-pallet-preview--500-bg w-40 h-40 mr-4 flex items-center justify-center" style="background-color:{{ hex }};color:{{ content_hex }};">
+      <div class="text-8xl neo-pallet-preview--500-content"><span>A</span><span>a</span></div>
+    </div>
+    <div class="neo-pallet-preview--info">
+      <div class="mb-2">
+        <div class="font-bold text-sm">HEX</div>
+        <div class="neo-pallet-preview--500-hex">{{ hex }}</div>
+      </div>
+      <div class="mb-2">
+        <div class="font-bold text-sm">RGB</div>
+        <div class="neo-pallet-preview--500-rgb">{{ rgb }}</div>
+      </div>
+      <div class="">
+        <div class="font-bold text-sm">HSL</div>
+        <div class="neo-pallet-preview--500-hsl">{{ hsl }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="neo-pallet-preview--second">
+    <div class="neo-pallet-preview--shades grid grid-cols-3 gap-2">
+      {% for id, shade in shades %}
+        <div class="flex items-center">
+          <div class="neo-pallet-preview--{{ id }}-swatch neo-pallet-preview--{{ id }}-bg w-8 h-8 mr-2 flex items-center justify-center" style="background-color:{{ shade.getHex }};color:{{ shade.getContentHex }};">
+            <div class="text-lg neo-pallet-preview--{{ id }}-content"><span>A</span><span>a</span></div>
+          </div>
+          <div class="mr-2 w-8 text-right">
+            {{ id }}
+          </div>
+          <div class="neo-pallet-preview--{{ id }}-hex">
+            {{ data.color }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

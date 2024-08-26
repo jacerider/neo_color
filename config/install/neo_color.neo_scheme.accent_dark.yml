@@ -1,0 +1,13 @@
+uuid: 4dd3b335-c0a7-4686-a8a0-460262c98184
+langcode: en
+status: true
+dependencies: {  }
+id: accent_dark
+label: 'Accent Dark'
+dark: true
+base: base
+primary: accent
+secondary: accent
+accent: primary
+weight: 1
+colorize: null

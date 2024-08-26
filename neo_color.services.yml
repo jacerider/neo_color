@@ -1,0 +1,11 @@
+services:
+  neo_color.neo_build_event_subscriber:
+    class: '\Drupal\neo_color\EventSubscriber\NeoBuildEventSubscriber'
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: 'event_subscriber' }
+  neo_color.neo_build_inline_event_subscriber:
+    class: '\Drupal\neo_color\EventSubscriber\NeoBuildInlineEventSubscriber'
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: 'event_subscriber' }

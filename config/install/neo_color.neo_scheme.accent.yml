@@ -1,0 +1,13 @@
+uuid: 012821db-6f4b-49a9-89ff-5c0ce91457a2
+langcode: en
+status: true
+dependencies: {  }
+id: accent
+label: Accent
+dark: false
+base: base
+primary: accent
+secondary: accent
+accent: primary
+weight: 0
+colorize: null

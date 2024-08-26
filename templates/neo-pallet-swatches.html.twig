@@ -1,0 +1,5 @@
+<div class="neo-pallet-swatches flex items-center">
+  {% for id, shade in shades %}
+    <div class="neo-pallet-swatches--{{ id }}-swatch w-8 h-6 mr-2 text-xs flex items-center justify-center" style="background-color:{{ shade.getHex }};color:{{ shade.getContentHex }};">{{ id }}</div>
+  {% endfor %}
+</div>

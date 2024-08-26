@@ -1,0 +1,45 @@
+uuid: f670ca08-236e-469c-92dc-885947e531d1
+langcode: en
+status: true
+dependencies: {  }
+id: accent
+label: Accent
+specific: false
+shades:
+  50:
+    color: '#fdebee'
+    dark: '1'
+  100:
+    color: '#fad8dc'
+    dark: '1'
+  200:
+    color: '#f6b1b9'
+    dark: '1'
+  300:
+    color: '#f18996'
+    dark: '1'
+  400:
+    color: '#ed6273'
+    dark: '0'
+  500:
+    color: '#e83b50'
+    dark: '0'
+  600:
+    color: '#ba2f40'
+    dark: '0'
+  700:
+    color: '#8b2330'
+    dark: '0'
+  800:
+    color: '#5d1820'
+    dark: '0'
+  900:
+    color: '#2e0c10'
+    dark: '0'
+  950:
+    color: '#170608'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

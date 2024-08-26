@@ -1,0 +1,45 @@
+uuid: 5e538e4e-cd83-4b94-8966-fc1cc8aa31e2
+langcode: en
+status: false
+dependencies: {  }
+id: teal
+label: Teal
+specific: true
+shades:
+  50:
+    color: '#f0fdfa'
+    dark: '1'
+  100:
+    color: '#ccfbf1'
+    dark: '1'
+  200:
+    color: '#99f6e4'
+    dark: '1'
+  300:
+    color: '#5eead4'
+    dark: '1'
+  400:
+    color: '#2dd4bf'
+    dark: '1'
+  500:
+    color: '#14b8a6'
+    dark: '1'
+  600:
+    color: '#0d9488'
+    dark: '0'
+  700:
+    color: '#0f766e'
+    dark: '0'
+  800:
+    color: '#115e59'
+    dark: '0'
+  900:
+    color: '#134e4a'
+    dark: '0'
+  950:
+    color: '#042f2e'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

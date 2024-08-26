@@ -1,0 +1,173 @@
+neo_color.neo_pallet.*:
+  type: config_entity
+  label: Pallet
+  mapping:
+    id:
+      type: string
+      label: ID
+    label:
+      type: label
+      label: Label
+    uuid:
+      type: string
+    specific:
+      type: boolean
+      label: 'Specify color per shade'
+    shades:
+      type: mapping
+      label: 'Shades'
+      mapping:
+        50:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '50 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        100:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '100 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        200:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '200 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        300:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '300 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        400:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '400 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        500:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '500 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        600:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '600 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        700:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '700 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        800:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '800 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        900:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '900 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+        950:
+          type: mapping
+          label: 'Shades'
+          mapping:
+            color:
+              type: string
+              label: '950 Color'
+            dark:
+              type: string
+              label: 'Use Dark Content'
+    content:
+      type: mapping
+      label: 'Content'
+      mapping:
+        pallet:
+          type: string
+          label: 'The content pallet'
+        light:
+          type: string
+          label: 'The light shade or custom HEX'
+        dark:
+          type: string
+          label: 'The dark shade or custom HEX'
+
+neo_color.neo_scheme.*:
+  type: config_entity
+  label: Scheme
+  mapping:
+    id:
+      type: string
+      label: ID
+    label:
+      type: label
+      label: Label
+    uuid:
+      type: string
+    dark:
+      type: boolean
+      label: 'Dark Mode'
+    base:
+      type: string
+      label: 'Base Pallet'
+    primary:
+      type: string
+      label: 'Primary Pallet'
+    secondary:
+      type: string
+      label: 'Secondary Pallet'
+    accent:
+      type: string
+      label: 'Accent Pallet'
+    weight:
+      type: integer
+      label: 'Weight'

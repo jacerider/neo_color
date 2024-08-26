@@ -1,0 +1,45 @@
+uuid: 852eeb57-1875-4d10-bce8-38596f11a2af
+langcode: en
+status: false
+dependencies: {  }
+id: green
+label: Green
+specific: true
+shades:
+  50:
+    color: '#f0fdf4'
+    dark: '1'
+  100:
+    color: '#dcfce7'
+    dark: '1'
+  200:
+    color: '#bbf7d0'
+    dark: '1'
+  300:
+    color: '#86efac'
+    dark: '1'
+  400:
+    color: '#4ade80'
+    dark: '1'
+  500:
+    color: '#22c55e'
+    dark: '1'
+  600:
+    color: '#16a34a'
+    dark: '0'
+  700:
+    color: '#15803d'
+    dark: '0'
+  800:
+    color: '#166534'
+    dark: '0'
+  900:
+    color: '#14532d'
+    dark: '0'
+  950:
+    color: '#052e16'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

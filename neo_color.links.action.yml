@@ -1,0 +1,11 @@
+entity.neo_pallet.add_form:
+  route_name: 'entity.neo_pallet.add_form'
+  title: 'Add pallet'
+  appears_on:
+    - entity.neo_pallet.collection
+
+entity.neo_scheme.add_form:
+  route_name: 'entity.neo_scheme.add_form'
+  title: 'Add scheme'
+  appears_on:
+    - entity.neo_scheme.collection

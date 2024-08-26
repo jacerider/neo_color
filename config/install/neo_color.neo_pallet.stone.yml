@@ -1,0 +1,45 @@
+uuid: af32d547-70eb-48d8-a0d0-ab36b8e58905
+langcode: en
+status: false
+dependencies: {  }
+id: stone
+label: Stone
+specific: true
+shades:
+  50:
+    color: '#fafaf9'
+    dark: '1'
+  100:
+    color: '#f5f5f4'
+    dark: '1'
+  200:
+    color: '#e7e5e4'
+    dark: '1'
+  300:
+    color: '#d6d3d1'
+    dark: '1'
+  400:
+    color: '#a8a29e'
+    dark: '1'
+  500:
+    color: '#78716c'
+    dark: '0'
+  600:
+    color: '#57534e'
+    dark: '0'
+  700:
+    color: '#44403c'
+    dark: '0'
+  800:
+    color: '#292524'
+    dark: '0'
+  900:
+    color: '#1c1917'
+    dark: '0'
+  950:
+    color: '#0c0a09'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

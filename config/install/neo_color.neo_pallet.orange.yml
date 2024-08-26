@@ -1,0 +1,45 @@
+uuid: 04ccc634-79af-45ed-8287-c252a35615d9
+langcode: en
+status: false
+dependencies: {  }
+id: orange
+label: Orange
+specific: true
+shades:
+  50:
+    color: '#fff7ed'
+    dark: '1'
+  100:
+    color: '#ffedd5'
+    dark: '1'
+  200:
+    color: '#fed7aa'
+    dark: '1'
+  300:
+    color: '#fdba74'
+    dark: '1'
+  400:
+    color: '#fb923c'
+    dark: '1'
+  500:
+    color: '#f97316'
+    dark: '0'
+  600:
+    color: '#ea580c'
+    dark: '0'
+  700:
+    color: '#c2410c'
+    dark: '0'
+  800:
+    color: '#9a3412'
+    dark: '0'
+  900:
+    color: '#7c2d12'
+    dark: '0'
+  950:
+    color: '#431407'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

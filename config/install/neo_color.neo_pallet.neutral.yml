@@ -1,0 +1,45 @@
+uuid: 9d54b5f3-5ee1-4d07-95f2-f4534dc4b834
+langcode: en
+status: false
+dependencies: {  }
+id: neutral
+label: Neutral
+specific: true
+shades:
+  50:
+    color: '#fafafa'
+    dark: '1'
+  100:
+    color: '#f5f5f5'
+    dark: '1'
+  200:
+    color: '#e5e5e5'
+    dark: '1'
+  300:
+    color: '#d4d4d4'
+    dark: '1'
+  400:
+    color: '#a3a3a3'
+    dark: '1'
+  500:
+    color: '#737373'
+    dark: '0'
+  600:
+    color: '#525252'
+    dark: '0'
+  700:
+    color: '#404040'
+    dark: '0'
+  800:
+    color: '#262626'
+    dark: '0'
+  900:
+    color: '#171717'
+    dark: '0'
+  950:
+    color: '#0a0a0a'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

@@ -1,0 +1,45 @@
+uuid: 27f4be6a-aa57-45fe-9ae6-f769bc6d4617
+langcode: en
+status: false
+dependencies: {  }
+id: amber
+label: Amber
+specific: true
+shades:
+  50:
+    color: '#fffbeb'
+    dark: '1'
+  100:
+    color: '#fef3c7'
+    dark: '1'
+  200:
+    color: '#fde68a'
+    dark: '1'
+  300:
+    color: '#fcd34d'
+    dark: '1'
+  400:
+    color: '#fbbf24'
+    dark: '1'
+  500:
+    color: '#f59e0b'
+    dark: '1'
+  600:
+    color: '#d97706'
+    dark: '0'
+  700:
+    color: '#b45309'
+    dark: '0'
+  800:
+    color: '#92400e'
+    dark: '0'
+  900:
+    color: '#78350f'
+    dark: '0'
+  950:
+    color: '#451a03'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'

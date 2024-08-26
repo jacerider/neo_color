@@ -1,0 +1,11 @@
+entity.neo_pallet.overview:
+  title: Color Pallets
+  parent: system.admin_config_neo
+  description: 'List of color pallets.'
+  route_name: entity.neo_pallet.collection
+
+entity.neo_scheme.overview:
+  title: Color Schemes
+  parent: system.admin_config_neo
+  description: 'List of color schemes.'
+  route_name: entity.neo_scheme.collection

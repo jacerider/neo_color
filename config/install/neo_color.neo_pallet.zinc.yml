@@ -1,0 +1,45 @@
+uuid: a1b076e2-1754-43d6-9d16-08a8d15b2190
+langcode: en
+status: false
+dependencies: {  }
+id: zinc
+label: Zinc
+specific: true
+shades:
+  50:
+    color: '#fafafa'
+    dark: '1'
+  100:
+    color: '#f4f4f5'
+    dark: '1'
+  200:
+    color: '#e4e4e7'
+    dark: '1'
+  300:
+    color: '#d4d4d8'
+    dark: '1'
+  400:
+    color: '#a1a1aa'
+    dark: '1'
+  500:
+    color: '#71717a'
+    dark: '0'
+  600:
+    color: '#52525b'
+    dark: '0'
+  700:
+    color: '#3f3f46'
+    dark: '0'
+  800:
+    color: '#27272a'
+    dark: '0'
+  900:
+    color: '#18181b'
+    dark: '0'
+  950:
+    color: '#09090b'
+    dark: '0'
+content:
+  pallet: base
+  light: '50'
+  dark: '950'
