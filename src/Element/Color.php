@@ -96,6 +96,7 @@ final class Color extends FormElementBase {
     $pallets = \Drupal::entityTypeManager()->getStorage('neo_pallet')->loadByProperties([
       'status' => 1,
     ]);
+    uasort($pallets, ['\Drupal\neo_color\Entity\Pallet', 'sort']);
     $palletOptions = [];
     if (!$required) {
       $palletOptions[''] = [
