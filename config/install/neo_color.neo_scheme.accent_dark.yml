@@ -5,9 +5,9 @@ dependencies: {  }
 id: accent_dark
 label: 'Accent Dark'
 dark: true
+colorize: false
 base: base
 primary: accent
 secondary: accent
 accent: primary
 weight: 1
-colorize: null

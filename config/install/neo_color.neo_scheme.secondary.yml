@@ -5,9 +5,10 @@ dependencies: {  }
 id: secondary
 label: Secondary
 dark: false
+colorize: false
 base: base
 primary: secondary
 secondary: secondary
 accent: primary
 weight: -4
-colorize: null
+colorize: false

@@ -5,6 +5,7 @@ dependencies: {  }
 id: secondary_solid
 label: 'Secondary Solid'
 dark: false
+colorize: false
 base: secondary
 primary: secondary
 secondary: secondary

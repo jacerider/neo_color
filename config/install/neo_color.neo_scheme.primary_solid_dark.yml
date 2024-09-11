@@ -5,6 +5,7 @@ dependencies: {  }
 id: primary_solid_dark
 label: 'Primary Solid Dark'
 dark: true
+colorize: false
 base: primary
 primary: primary
 secondary: primary

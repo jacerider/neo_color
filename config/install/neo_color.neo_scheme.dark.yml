@@ -5,6 +5,7 @@ dependencies: {  }
 id: dark
 label: 'Dark'
 dark: true
+colorize: false
 base: base
 primary: primary
 secondary: secondary

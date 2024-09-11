@@ -156,6 +156,9 @@ neo_color.neo_scheme.*:
     dark:
       type: boolean
       label: 'Dark Mode'
+    colorize:
+      type: boolean
+      label: 'Colorize'
     base:
       type: string
       label: 'Base Pallet'
