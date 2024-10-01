@@ -104,8 +104,18 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       $shades = $this->shades ?? [];
       $darkHex = $this->getContentDarkHex();
       $lightHex = $this->getContentLightHex();
-      foreach (PalletInterface::SHADES as $shade) {
+      $nums = PalletInterface::SHADES;
+      if ($this->id() === 'base') {
+        // The base pallet has a 0 shade.
+        array_unshift($nums, 0);
+      }
+      foreach ($nums as $shade) {
         $shade = (string) $shade;
+        if ($shade === '0') {
+          // The 0 shade is always white.
+          $shades[$shade]['color'] = '#ffffff';
+          $shades[$shade]['dark'] = TRUE;
+        }
         $color = $shades[$shade]['color'] ?? PalletInterface::DEFAULT_COLOR;
         $dark = !empty($shades[$shade]['dark']) ?? TRUE;
         $content = $dark ? $darkHex : $lightHex;

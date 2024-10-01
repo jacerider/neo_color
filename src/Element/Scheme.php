@@ -35,6 +35,14 @@ final class Scheme extends FormElementBase {
       '#value_callback' => [
         [$class, 'valueCallback'],
       ],
+      // Allowm selection of schemes that are dark enabled.
+      '#allow_dark' => TRUE,
+      // Allowm selection of schemes that are color enabled.
+      '#allow_color' => TRUE,
+      // Includes schemes by id.
+      '#include' => [],
+      // Excludes schemes by id.
+      '#exclude' => [],
       // Can be raw, class.
       '#format' => 'raw',
       '#theme_wrappers' => ['fieldset'],
@@ -57,11 +65,24 @@ final class Scheme extends FormElementBase {
   public static function processNeoScheme(&$element, FormStateInterface $form_state, &$complete_form): array {
     $defaultValue = $element['#default_value'];
     $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
+    $properties = [
+      'status' => 1,
+    ];
+    if (empty($element['#allow_dark'])) {
+      $properties['dark'] = 0;
+    }
+    if (empty($element['#allow_color'])) {
+      $properties['colorize'] = 0;
+    }
 
     /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
-    $schemes = \Drupal::entityTypeManager()->getStorage('neo_scheme')->loadByProperties([
-      'status' => 1,
-    ]);
+    $schemes = \Drupal::entityTypeManager()->getStorage('neo_scheme')->loadByProperties($properties);
+    if (!empty($element['#include'])) {
+      $schemes = array_intersect_key($schemes, array_flip($element['#include']));
+    }
+    if (!empty($element['#exclude'])) {
+      $schemes = array_diff_key($schemes, array_flip($element['#exclude']));
+    }
     switch ($element['#format']) {
       case 'class':
         foreach ($schemes as $scheme) {

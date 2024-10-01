@@ -1,0 +1,13 @@
+uuid: 3d17bea8-2610-4b19-adbc-3d92851c3939
+langcode: en
+status: true
+dependencies: {  }
+id: success
+label: Success
+dark: false
+colorize: false
+base: base
+primary: success
+secondary: success
+accent: primary
+weight: 4

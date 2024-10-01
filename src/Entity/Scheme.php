@@ -8,6 +8,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\neo_color\PalletInterface;
 use Drupal\neo_color\SchemeInterface;
+use Drupal\neo_color\Shade;
 
 /**
  * Defines the scheme entity type.
@@ -133,39 +134,67 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
   public function getCssData():array {
     $css = [];
     $pallets = $this->getPallets();
+    $isDark = $this->get('dark');
     foreach ($pallets as $id => $pallet) {
-      $isDark = $this->get('dark');
       $palletCss = $pallet->getCssData($id, $isDark);
-      // When dark mode, invert the shades.
-      if ($isDark) {
-        $palletCss['--color-white'] = '0 0 0';
-        $palletCss['--color-black'] = '255 255 255';
-      }
+      $originalPalletCss = $palletCss;
       if ($this->get('colorize')) {
         if ($id === 'base') {
-          $swap = [
-            600 => 500,
-            700 => 500,
-            800 => 500,
-            900 => 500,
-            950 => 500,
-          ];
-          foreach ($swap as $from => $to) {
-            $palletCss['--color-' . $id . '-' . $from] = $palletCss['--color-' . $id . '-' . $to];
-            $palletCss['--color-' . $id . '-content-' . $from] = $palletCss['--color-' . $id . '-content-' . $to];
-            $palletCss['--color-shadow-' . $from] = $palletCss['--color-shadow-' . $to];
+          $offsetShades = array_combine(array_slice(PalletInterface::SHADES, 0, 6), array_reverse($this->generateGradients($pallet->getShade(500)->getHex(), $pallet->getShade(400)->getHex(), 6)))
+            + array_combine(array_slice(PalletInterface::SHADES, 6), array_reverse($this->generateGradients($pallet->getShade(700)->getHex(), $pallet->getShade(500)->getHex(), 5)));
+          if ($isDark) {
+            $offsetShades = array_combine(PalletInterface::SHADES, array_reverse($offsetShades));
           }
+          foreach ($offsetShades as $shade => $hex) {
+            $contentShade = $shade === '500' ? '500' : ((int) $shade < 500 ? '700' : '400');
+            $offsetShade = new Shade((string) $shade, $hex, $pallet->getShade($contentShade)->getContentHex(), $isDark);
+            $palletCss['--color-' . $id . '-' . $shade] = implode(' ', $offsetShade->getRgb());
+            $palletCss['--color-' . $id . '-content-' . $shade] = implode(' ', $offsetShade->getContentRgb());
+            [$r, $g, $b] = sscanf($palletCss['--color-' . $id . '-' . $shade], '%d %d %d');
+            $r = round(max(0, $r * 0.65));
+            $g = round(max(0, $g * 0.65));
+            $b = round(max(0, $b * 0.65));
+            $palletCss['--color-shadow-' . $shade] = "$r $g $b";
+          }
+          $palletCss['--color-' . $id . '-0'] = $palletCss['--color-' . $id . '-500'];
+          $palletCss['--color-' . $id . '-content-0'] = $palletCss['--color-' . $id . '-content-500'];
         }
         elseif ($pallets['base']->id() === $pallet->id()) {
-          foreach (PalletInterface::SHADES as $shade) {
-            $palletCss['--color-' . $id . '-' . $shade] = $palletCss['--color-' . $id . '-50'];
-            $palletCss['--color-' . $id . '-content-' . $shade] = $palletCss['--color-' . $id . '-content-50'];
+          // This happens when a scheme pallet is set to use the same pallet as
+          // the base pallet.
+          $swap = [
+            50 => 400,
+            100 => 300,
+            200 => 200,
+            300 => 100,
+            400 => 50,
+            600 => 50,
+            700 => 100,
+            800 => 200,
+            900 => 300,
+            950 => 400,
+          ];
+          foreach ($swap as $from => $to) {
+            $palletCss['--color-' . $id . '-' . $from] = $originalPalletCss['--color-' . $id . '-' . $to];
+            $palletCss['--color-' . $id . '-content-' . $from] = $originalPalletCss['--color-' . $id . '-content-' . $to];
           }
+          $shade500 = new Shade('500', $isDark ? $pallet->getContentDarkHex() : $pallet->getContentLightHex(), $isDark ? $pallet->getContentLightHex() : $pallet->getContentDarkHex(), $isDark);
+          $palletCss['--color-' . $id . '-500'] = implode(' ', $shade500->getRgb());
+          $palletCss['--color-' . $id . '-content-500'] = implode(' ', $shade500->getContentRgb());
+          $palletCss['--color-' . $id] = $originalPalletCss['--color-' . $id . '-500'];
+          $palletCss['--color-' . $id . '-content'] = $originalPalletCss['--color-' . $id . '-content-500'];
         }
       }
       foreach ($palletCss as $key => $value) {
         $css[$key] = $value;
       }
+    }
+    // When dark mode, invert the shades.
+    if ($isDark) {
+      // $css['--color-white'] = '0 0 0';
+      // $css['--color-white-content'] = '255 255 255';
+      // $css['--color-black'] = '255 255 255';
+      // $css['--color-black-content'] = '255 255 255';
     }
     return $css;
   }
@@ -208,6 +237,63 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
       return $status;
     }
     return $a->getWeight() - $b->getWeight();
+  }
+
+  /**
+   * Generate gradients.
+   *
+   * @param string $colorBegin
+   *   The beginning color.
+   * @param string $colorEnd
+   *   The ending color.
+   * @param int $steps
+   *   The number of steps.
+   *
+   * @return array
+   *   The gradient.
+   */
+  protected function generateGradients($colorBegin = 0x000000, $colorEnd = 0xffffff, $steps = 10) {
+    $colorBegin = hexdec(str_replace('#', '', (string) $colorBegin));
+    $colorEnd = hexdec(str_replace('#', '', (string) $colorEnd));
+
+    $colorBegin = (($colorBegin >= 0x000000) && ($colorBegin <= 0xffffff)) ? $colorBegin : 0x000000;
+    $colorEnd = (($colorEnd >= 0x000000) && ($colorEnd <= 0xffffff)) ? $colorEnd : 0xffffff;
+    $steps = (($steps > 0) && ($steps < 256)) ? $steps : 16;
+
+    $theR0 = ($colorBegin & 0xff0000) >> 16;
+    $theG0 = ($colorBegin & 0x00ff00) >> 8;
+    $theB0 = ($colorBegin & 0x0000ff) >> 0;
+
+    $theR1 = ($colorEnd & 0xff0000) >> 16;
+    $theG1 = ($colorEnd & 0x00ff00) >> 8;
+    $theB1 = ($colorEnd & 0x0000ff) >> 0;
+
+    $result = [];
+
+    for ($i = 1; $i <= $steps; $i++) {
+      $theR = $this->generateGradientsInterpolate($theR0, $theR1, $i, $steps);
+      $theG = $this->generateGradientsInterpolate($theG0, $theG1, $i, $steps);
+      $theB = $this->generateGradientsInterpolate($theB0, $theB1, $i, $steps);
+
+      $theVal = ((($theR << 8) | $theG) << 8) | $theB;
+      $result[] = strtolower(sprintf("#%06X", $theVal));
+    }
+    return $result;
+  }
+
+  /**
+   * Generate gradient interpolation.
+   *
+   * @return int
+   *   The gradient interpolation.
+   */
+  protected function generateGradientsInterpolate($pBegin, $pEnd, $pStep, $pMax): int {
+    if ($pBegin < $pEnd) {
+      return (int) (($pEnd - $pBegin) * ($pStep / $pMax)) + $pBegin;
+    }
+    else {
+      return (int) (($pBegin - $pEnd) * (1 - ($pStep / $pMax))) + $pEnd;
+    }
   }
 
 }

@@ -1,0 +1,13 @@
+uuid: 8d350827-db11-4c5d-aeca-cc3727530904
+langcode: en
+status: true
+dependencies: {  }
+id: warning
+label: Warning
+dark: false
+colorize: false
+base: base
+primary: warning
+secondary: warning
+accent: primary
+weight: 5

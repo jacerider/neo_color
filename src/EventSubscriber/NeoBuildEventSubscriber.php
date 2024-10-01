@@ -39,8 +39,8 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     $config['tailwind']['theme']['extend']['borderColor']['DEFAULT'] = 'rgb(var(--color-base-300) / <alpha-value>)';
     foreach ($pallets as $pallet) {
       $id = $pallet->id();
-      $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id-500) / <alpha-value>)";
-      $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content-500) / <alpha-value>)";
+      $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id) / <alpha-value>)";
+      $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content) / <alpha-value>)";
       foreach ($pallet->getShades() as $shadeId => $shade) {
         $config['tailwind']['theme']['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId) / <alpha-value>)";
         $config['tailwind']['theme']['colors'][$id . '-content'][$shadeId] = "rgb(var(--color-$id-content-$shadeId) / <alpha-value>)";
@@ -48,6 +48,27 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     }
     // Text base should use the base content color.
     $config['tailwind']['utilities']['.text-base']['color'] = 'colors.base-content.500';
+
+    /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
+    $schemes = $this->entityTypeManager->getStorage('neo_scheme')->loadByProperties([
+      'status' => 1,
+    ]);
+    foreach ($schemes as $scheme) {
+      $selector = $scheme->getSelector();
+      $config['tailwind']['variants'][str_replace('scheme-', '', $selector)] = [
+        '.' . $selector . ' &',
+        '&.' . $selector,
+      ];
+      if ($scheme->get('dark')) {
+        $config['tailwind']['variants']['dark'][] = '.' . $selector . ' &';
+        $config['tailwind']['variants']['dark'][] = '&.' . $selector;
+      }
+      if ($scheme->get('colorize')) {
+        $config['tailwind']['variants']['color'][] = '.' . $selector . ' &';
+        $config['tailwind']['variants']['color'][] = '&.' . $selector;
+      }
+    }
+
     $event->setConfig($config);
   }
 
