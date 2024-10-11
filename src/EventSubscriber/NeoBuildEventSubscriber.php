@@ -47,7 +47,7 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
       }
     }
     // Text base should use the base content color.
-    $config['tailwind']['utilities']['.text-base']['color'] = 'colors.base-content.500';
+    $config['tailwind']['utilities']['.text-base']['color'] = 'colors.base-content.50';
 
     /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
     $schemes = $this->entityTypeManager->getStorage('neo_scheme')->loadByProperties([
