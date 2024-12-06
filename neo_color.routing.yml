@@ -28,7 +28,7 @@ entity.neo_pallet.duplicate_form:
     _entity_form: 'neo_pallet.duplicate'
     _title: 'Duplicate pallet'
   requirements:
-    _permission: 'administer neo_pallet'
+    _entity_create_access: 'neo_pallet'
 
 entity.neo_pallet.delete_form:
   path: '/admin/config/neo/pallet/{neo_pallet}/delete'

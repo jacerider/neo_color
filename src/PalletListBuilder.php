@@ -94,11 +94,13 @@ final class PalletListBuilder extends ConfigEntityListBuilder {
    */
   public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
-    $operations['duplicate'] = [
-      'title' => $this->t('Duplicate'),
-      'weight' => 99,
-      'url' => $this->ensureDestination($entity->toUrl('duplicate-form')),
-    ];
+    if ($entity->access('update')) {
+      $operations['duplicate'] = [
+        'title' => $this->t('Duplicate'),
+        'weight' => 99,
+        'url' => $this->ensureDestination($entity->toUrl('duplicate-form')),
+      ];
+    }
     return $operations;
   }
 
