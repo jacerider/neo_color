@@ -36,4 +36,11 @@ class SchemeItem extends EntityReferenceItem {
     return $element;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function getPreconfiguredOptions() {
+    return [];
+  }
+
 }
