@@ -123,7 +123,7 @@ final class Color extends FormElementBase {
     $element['pallet'] = [
       '#type' => 'radios',
       '#title' => t('Pallet'),
-      '#style' => 'inline_elements',
+      '#neo_style' => 'inline_elements',
       '#options' => $palletOptions,
       '#required' => !empty($element['#required']),
       '#default_value' => $defaultPallet,
@@ -148,7 +148,7 @@ final class Color extends FormElementBase {
       $element['shade'] = [
         '#type' => 'radios',
         '#title' => t('Shade'),
-        '#style' => 'inline_elements',
+        '#neo_style' => 'inline_elements',
         '#options' => $shadeOptions,
         '#required' => !empty($element['#required']),
         '#default_value' => $defaultShade,

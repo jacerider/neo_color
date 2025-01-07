@@ -91,7 +91,7 @@ final class SchemeWidget extends OptionsButtonsWidget {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
-    $element['#style'] = 'inline_elements';
+    $element['#neo_style'] = 'inline_elements';
     return $element;
   }
 

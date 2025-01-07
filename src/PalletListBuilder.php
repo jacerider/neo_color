@@ -84,7 +84,7 @@ final class PalletListBuilder extends ConfigEntityListBuilder {
         '#theme' => 'neo_pallet_swatches',
         '#neo_pallet' => $entity,
       ],
-      'class' => 'td--min',
+      '#neo_size' => 'min',
     ];
     return $row + parent::buildRow($entity);
   }

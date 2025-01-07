@@ -125,7 +125,7 @@ final class Scheme extends FormElementBase {
     $element['scheme'] = [
       '#type' => 'radios',
       '#title' => t('Pallet'),
-      '#style' => 'inline_elements',
+      '#neo_style' => 'inline_elements',
       '#options' => $schemeOptions,
       '#required' => !empty($element['#required']),
       '#default_value' => $defaultValue,

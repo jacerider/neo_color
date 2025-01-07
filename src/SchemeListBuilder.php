@@ -41,14 +41,14 @@ final class SchemeListBuilder extends DraggableListBuilder {
         '#tag' => 'pre',
         '#value' => '.' . $entity->getSelector(),
       ],
-      '#wrapper_attributes' => ['class' => ['td--min']],
+      '#neo_size' => 'min',
     ];
     $row['preview'] = [
       'data' => [
         '#theme' => 'neo_scheme_swatch',
         '#neo_scheme' => $entity,
       ],
-      '#wrapper_attributes' => ['class' => ['td--min']],
+      '#neo_size' => 'min',
     ];
     return $row + parent::buildRow($entity);
   }
