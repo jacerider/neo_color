@@ -105,10 +105,11 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       $darkHex = $this->getContentDarkHex();
       $lightHex = $this->getContentLightHex();
       $nums = PalletInterface::SHADES;
-      if ($this->id() === 'base') {
-        // The base pallet has a 0 shade.
-        array_unshift($nums, 0);
-      }
+      // if ($this->id() === 'base') {
+      //   // The base pallet has a 0 shade.
+      //   array_unshift($nums, 0);
+      // }
+      array_unshift($nums, 0);
       foreach ($nums as $shade) {
         $shade = (string) $shade;
         if ($shade === '0') {
@@ -154,7 +155,7 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
    * {@inheritdoc}
    */
   public function getContentLight():string {
-    $color = $this->content['light'] ?? '#000000';
+    $color = $this->content['light'] ?? '#ffffff';
     if (substr($color, 0, 1) === '#' && $this->getContentPalletId()) {
       $color = '50';
     }

@@ -162,39 +162,31 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
         elseif ($pallets['base']->id() === $pallet->id()) {
           // This happens when a scheme pallet is set to use the same pallet as
           // the base pallet.
-          $swap = [
-            50 => 400,
-            100 => 300,
-            200 => 200,
-            300 => 100,
-            400 => 50,
-            600 => 50,
-            700 => 100,
-            800 => 200,
-            900 => 300,
-            950 => 400,
-          ];
-          foreach ($swap as $from => $to) {
-            $palletCss['--color-' . $id . '-' . $from] = $originalPalletCss['--color-' . $id . '-' . $to];
-            $palletCss['--color-' . $id . '-content-' . $from] = $originalPalletCss['--color-' . $id . '-content-' . $to];
+          if (!$isDark) {
+            $offsetShades = array_combine(array_slice(PalletInterface::SHADES, 0, 6), $this->generateGradients('#ffffff', '#ffffff', 6))
+            + array_combine(array_slice(PalletInterface::SHADES, 6), $this->generateGradients('#ffffff', $pallet->getShade(500)->getHex(), 5));
           }
-          $shade500 = new Shade('500', $isDark ? $pallet->getContentDarkHex() : $pallet->getContentLightHex(), $isDark ? $pallet->getContentLightHex() : $pallet->getContentDarkHex(), $isDark);
-          $palletCss['--color-' . $id . '-500'] = implode(' ', $shade500->getRgb());
-          $palletCss['--color-' . $id . '-content-500'] = implode(' ', $shade500->getContentRgb());
-          $palletCss['--color-' . $id] = $originalPalletCss['--color-' . $id . '-500'];
-          $palletCss['--color-' . $id . '-content'] = $originalPalletCss['--color-' . $id . '-content-500'];
+          else {
+            $offsetShades = array_combine(array_slice(PalletInterface::SHADES, 0, 6), $this->generateGradients('#000000', '#000000', 6))
+            + array_combine(array_slice(PalletInterface::SHADES, 6), $this->generateGradients('#000000', $pallet->getShade(500)->getHex(), 5));
+          }
+          foreach ($offsetShades as $shade => $hex) {
+            $offsetShade = new Shade((string) $shade, $hex, $isDark ? '#ffffff' : '#000000', $isDark);
+            $palletCss['--color-' . $id . '-' . $shade] = implode(' ', $offsetShade->getRgb());
+            $palletCss['--color-' . $id . '-content-' . $shade] = implode(' ', $offsetShade->getContentRgb());
+            [$r, $g, $b] = sscanf($palletCss['--color-' . $id . '-' . $shade], '%d %d %d');
+            $r = round(max(0, $r * 0.65));
+            $g = round(max(0, $g * 0.65));
+            $b = round(max(0, $b * 0.65));
+            $palletCss['--color-shadow-' . $shade] = "$r $g $b";
+          }
+          $palletCss['--color-' . $id . '-0'] = $palletCss['--color-' . $id . '-500'];
+          $palletCss['--color-' . $id . '-content-0'] = $palletCss['--color-' . $id . '-content-500'];
         }
       }
       foreach ($palletCss as $key => $value) {
         $css[$key] = $value;
       }
-    }
-    // When dark mode, invert the shades.
-    if ($isDark) {
-      // $css['--color-white'] = '0 0 0';
-      // $css['--color-white-content'] = '255 255 255';
-      // $css['--color-black'] = '255 255 255';
-      // $css['--color-black-content'] = '255 255 255';
     }
     return $css;
   }

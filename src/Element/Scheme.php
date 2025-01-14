@@ -28,6 +28,7 @@ final class Scheme extends FormElementBase {
     $class = static::class;
     return [
       '#input' => TRUE,
+      '#multiple' => FALSE,
       '#process' => [
         [$class, 'processGroup'],
         [$class, 'processNeoScheme'],
@@ -35,6 +36,7 @@ final class Scheme extends FormElementBase {
       '#value_callback' => [
         [$class, 'valueCallback'],
       ],
+      '#show_title' => TRUE,
       // Allowm selection of schemes that are dark enabled.
       '#allow_dark' => TRUE,
       // Allowm selection of schemes that are color enabled.
@@ -45,7 +47,7 @@ final class Scheme extends FormElementBase {
       '#exclude' => [],
       // Can be raw, class.
       '#format' => 'raw',
-      '#theme_wrappers' => ['fieldset'],
+      '#theme_wrappers' => ['form_element'],
     ];
   }
 
@@ -63,7 +65,7 @@ final class Scheme extends FormElementBase {
    *   The modified element.
    */
   public static function processNeoScheme(&$element, FormStateInterface $form_state, &$complete_form): array {
-    $defaultValue = $element['#default_value'];
+    $defaultValue = $element['#default_value'] ?? NULL;
     $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
     $properties = [
       'status' => 1,
@@ -121,10 +123,15 @@ final class Scheme extends FormElementBase {
       ];
     }
 
-    $element['#element_validate'][] = [static::class, 'elementValidate'];
+    $element['#element_validate'] = $element['#element_validate'] ?? [];
+    array_unshift($element['#element_validate'], [
+      static::class,
+      'elementValidate',
+    ]);
+
     $element['scheme'] = [
-      '#type' => 'radios',
-      '#title' => t('Pallet'),
+      '#type' => $element['#multiple'] ? 'checkboxes' : 'radios',
+      '#title' => $element['#show_title'] ? ($element['#title'] ?? NULL) : NULL,
       '#neo_style' => 'inline_elements',
       '#options' => $schemeOptions,
       '#required' => !empty($element['#required']),
@@ -142,19 +149,28 @@ final class Scheme extends FormElementBase {
    */
   public static function elementValidate($element, FormStateInterface $form_state, $form) {
     $value = $form_state->getValue($element['#parents']);
-    $value = $value['scheme'] ?? '';
+    $value = $value['scheme'] ?? [];
+    if (!is_array($value)) {
+      $value = [$value];
+    }
     if ($value) {
+      $value = array_values(array_filter($value));
       /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
       $schemes = \Drupal::entityTypeManager()->getStorage('neo_scheme')->loadByProperties([
         'status' => 1,
       ]);
-      switch ($element['#format']) {
-        case 'class':
-          if (isset($schemes[$value])) {
-            $value = $schemes[$value]->getSelector();
-          }
-          break;
+      foreach ($value as $key => $scheme) {
+        switch ($element['#format']) {
+          case 'class':
+            if (isset($schemes[$value[$key]])) {
+              $value[$key] = $schemes[$value[$key]]->getSelector();
+            }
+            break;
+        }
       }
+    }
+    if (!$element['#multiple']) {
+      $value = reset($value);
     }
     $form_state->setValueForElement($element, $value);
   }
