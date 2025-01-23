@@ -47,7 +47,7 @@ final class Scheme extends FormElementBase {
       '#exclude' => [],
       // Can be raw, class.
       '#format' => 'raw',
-      '#theme_wrappers' => ['form_element'],
+      '#theme_wrappers' => ['form_element', 'container'],
     ];
   }
 
