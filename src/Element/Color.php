@@ -78,15 +78,15 @@ final class Color extends FormElementBase {
         break;
     }
     $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
-    $defaultPallet = '';
-    $defaultShade = '';
+    $defaultPallet = NULL;
+    $defaultShade = NULL;
 
     $element['#tree'] = TRUE;
     $element['#element_validate'][] = [static::class, 'elementValidate'];
 
     if (is_string($defaultValue)) {
       $parts = explode('-', $defaultValue);
-      if (!empty($parts[0]) && !empty($parts[1])) {
+      if (!empty($parts[0]) && isset($parts[1])) {
         $defaultPallet = $parts[0];
         $defaultShade = $parts[1] ?? '500';
       }
@@ -136,7 +136,7 @@ final class Color extends FormElementBase {
     if ($pallet) {
       $shadeOptions = [];
       foreach ($pallet->getShades() as $shade) {
-        $shadeOptions[$shade->getId()] = [
+        $shadeOptions['shade-' . $shade->getId()] = [
           '#type' => 'inline_template',
           '#template' => '<div class="neo-pallet-swatches--{{ id }}-swatch w-8 h-6 mr-2 text-xs flex items-center justify-center rounded" style="background-color:{{ shade.getHex }};color:{{ shade.getContentHex }};">{{ id }}</div>',
           '#context' => [
@@ -151,7 +151,7 @@ final class Color extends FormElementBase {
         '#neo_style' => 'inline_elements',
         '#options' => $shadeOptions,
         '#required' => !empty($element['#required']),
-        '#default_value' => $defaultShade,
+        '#default_value' => !is_null($defaultShade) ? 'shade-' . $defaultShade : '',
       ];
       if ($allowOpacity) {
         $element['opacity'] = [
@@ -183,6 +183,9 @@ final class Color extends FormElementBase {
    */
   public static function elementValidate($element, FormStateInterface $form_state, $form) {
     $value = $originalValue = $form_state->getValue($element['#parents']);
+    if (!empty($value['shade'])) {
+      $value['shade'] = $originalValue['shade'] = str_replace('shade-', '', $value['shade']);
+    }
     if (!empty($value['pallet'])) {
       $value = $value['pallet'] . '-' . ($value['shade'] ?? '500');
       switch ($element['#format']) {
@@ -205,7 +208,7 @@ final class Color extends FormElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if ($input === FALSE) {
+    if ($input === FALSE || !is_array($input)) {
       return NULL;
     }
     return $input['pallet'] . '-' . ($input['shade'] ?? '500');
