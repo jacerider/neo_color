@@ -36,7 +36,6 @@ final class Scheme extends FormElementBase {
       '#value_callback' => [
         [$class, 'valueCallback'],
       ],
-      '#show_title' => TRUE,
       // Allowm selection of schemes that are dark enabled.
       '#allow_dark' => TRUE,
       // Allowm selection of schemes that are color enabled.
@@ -67,6 +66,7 @@ final class Scheme extends FormElementBase {
   public static function processNeoScheme(&$element, FormStateInterface $form_state, &$complete_form): array {
     $defaultValue = $element['#default_value'] ?? NULL;
     $required = isset($element['#states']['required']) ? TRUE : $element['#required'];
+    $multiple = $element['#multiple'];
     $properties = [
       'status' => 1,
     ];
@@ -97,7 +97,7 @@ final class Scheme extends FormElementBase {
     }
     uasort($schemes, ['Drupal\neo_color\Entity\Scheme', 'sort']);
     $schemeOptions = [];
-    if (!$required) {
+    if (!$required && !$multiple) {
       $schemeOptions[''] = [
         '#type' => 'inline_template',
         '#template' => '
@@ -131,7 +131,6 @@ final class Scheme extends FormElementBase {
 
     $element['scheme'] = [
       '#type' => $element['#multiple'] ? 'checkboxes' : 'radios',
-      '#title' => $element['#show_title'] ? ($element['#title'] ?? NULL) : NULL,
       '#neo_style' => 'inline_elements',
       '#options' => $schemeOptions,
       '#required' => !empty($element['#required']),

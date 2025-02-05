@@ -156,7 +156,6 @@ final class SchemeWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element['#type'] = 'neo_scheme';
-    $element['#show_title'] = FALSE;
     $element['#allow_dark'] = $this->getSetting('allow_dark');
     $element['#allow_color'] = $this->getSetting('allow_color');
     $element['#include'] = $this->getSetting('include');

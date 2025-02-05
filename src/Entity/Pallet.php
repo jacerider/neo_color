@@ -105,10 +105,6 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       $darkHex = $this->getContentDarkHex();
       $lightHex = $this->getContentLightHex();
       $nums = PalletInterface::SHADES;
-      // if ($this->id() === 'base') {
-      //   // The base pallet has a 0 shade.
-      //   array_unshift($nums, 0);
-      // }
       array_unshift($nums, 0);
       foreach ($nums as $shade) {
         $shade = (string) $shade;
@@ -219,7 +215,7 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCssData($id = NULL, $invert = FALSE):array {
+  public function getCssData($id = NULL, $invert = FALSE, $swap = FALSE, $forceContentColors = FALSE):array {
     $css = [];
     $id = $id ?? $this->id();
     $shades = $this->getShades();
@@ -229,13 +225,14 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
         $shade = $shades[array_reverse(PalletInterface::SHADES)[$pos]];
       }
       $rgb = implode(' ', $shade->getRgb());
-      $rgbContent = implode(' ', $shade->getContentRgb());
+      $rgbContent = implode(' ', $forceContentColors ? $shades[0]->getContentRgb() : $shade->getContentRgb());
+
       if ($shadeId == 500) {
-        $css["--color-$id"] = $rgb;
-        $css["--color-$id-content"] = $rgbContent;
+        $css["--color-$id"] = $swap ? (implode(' ', $invert ? $shades[950]->getRgb() : $shades[0]->getRgb())) : $rgb;
+        $css["--color-$id-content"] = $swap ? $rgb : $rgbContent;
       }
-      $css["--color-$id-$shadeId"] = $rgb;
-      $css["--color-$id-content-$shadeId"] = $rgbContent;
+      $css["--color-$id-$shadeId"] = $swap ? (implode(' ', $invert ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb())) : $rgb;
+      $css["--color-$id-content-$shadeId"] = $swap ? $rgb : $rgbContent;
       if ($id === 'base') {
         [$r, $g, $b] = sscanf($rgb, '%d %d %d');
         $r = round(max(0, $r * 0.65));

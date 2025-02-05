@@ -60,9 +60,9 @@ function template_preprocess_neo_pallet_swatches(&$variables) {
 function template_preprocess_neo_scheme_preview(&$variables) {
   /** @var \Drupal\neo_color\SchemeInterface $scheme */
   $scheme = $variables['neo_scheme'];
-  $variables['dark'] = $scheme->get('dark');
-  $variables['colorize'] = $scheme->get('colorize');
   if ($scheme instanceof SchemeInterface) {
+    $variables['dark'] = $scheme->get('dark');
+    $variables['colorize'] = $scheme->get('colorize');
     $variables['selector'] = $scheme->getSelector();
     $variables['css'] = [
       '#type' => 'html_tag',
@@ -81,10 +81,14 @@ function template_preprocess_neo_scheme_preview(&$variables) {
 function template_preprocess_neo_scheme_swatch(&$variables) {
   /** @var \Drupal\neo_color\SchemeInterface $scheme */
   $scheme = $variables['neo_scheme'];
-  $variables['dark'] = $scheme->get('dark');
-  $variables['colorize'] = $scheme->get('colorize');
   if ($scheme instanceof SchemeInterface) {
+    $variables['dark'] = $scheme->get('dark');
+    $variables['colorize'] = $scheme->get('colorize');
     $variables['selector'] = $scheme->getSelector();
+    $variables['base'] = $scheme->getBase();
+    $variables['primary'] = $scheme->getPrimary();
+    $variables['secondary'] = $scheme->getPrimary();
+    $variables['accent'] = $scheme->getAccent();
   }
 }
 

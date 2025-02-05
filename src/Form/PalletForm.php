@@ -271,6 +271,7 @@ final class PalletForm extends EntityForm implements ContainerInjectionInterface
         '#wrapper_attributes' => [
           'class' => [
             $specific ? '' : 'hidden',
+            'pt-8',
           ],
         ],
         '#ajax' => [

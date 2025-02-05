@@ -55,20 +55,20 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     ]);
     foreach ($schemes as $scheme) {
       $selector = $scheme->getSelector();
-      $config['tailwind']['variants'][str_replace('scheme-', '', $selector)] = [
-        '.' . $selector . ' &',
-        '&.' . $selector,
-      ];
-      if ($scheme->get('dark')) {
+      $key = str_replace('scheme-', '', $selector);
+      $config['tailwind']['variants'][$key][] = '.' . $selector . ' &';
+      $config['tailwind']['variants'][$key][] = '&.' . $selector;
+      $isDark = $scheme->get('dark');
+      $isColor = $scheme->get('colorize');
+      if ($isDark) {
         $config['tailwind']['variants']['dark'][] = '.' . $selector . ' &';
         $config['tailwind']['variants']['dark'][] = '&.' . $selector;
       }
-      if ($scheme->get('colorize')) {
+      if ($isColor) {
         $config['tailwind']['variants']['color'][] = '.' . $selector . ' &';
         $config['tailwind']['variants']['color'][] = '&.' . $selector;
       }
     }
-
     $event->setConfig($config);
   }
 

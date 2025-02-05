@@ -26,6 +26,38 @@ interface SchemeInterface extends ConfigEntityInterface {
   ];
 
   /**
+   * Get the base pallet.
+   *
+   * @return string
+   *   The base pallet.
+   */
+  public function getBase():string;
+
+  /**
+   * Get the primary pallet.
+   *
+   * @return string
+   *   The primary pallet.
+   */
+  public function getPrimary():string;
+
+  /**
+   * Get the secondary pallet.
+   *
+   * @return string
+   *   The secondary pallet.
+   */
+  public function getSecondary():string;
+
+  /**
+   * Get the accent pallet.
+   *
+   * @return string
+   *   The accent pallet.
+   */
+  public function getAccent():string;
+
+  /**
    * Get the selector.
    *
    * The selector is the class name that will be used to apply the scheme.

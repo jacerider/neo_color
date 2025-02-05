@@ -157,10 +157,16 @@ interface PalletInterface extends ConfigEntityInterface {
    *
    * @param string|null $id
    *   An optional override of the pallet id.
+   * @param bool $invert
+   *   If TRUE, the shade colors will be reversed. 0 will be 950, 950 will be 0.
+   * @param bool $swap
+   *   If TRUE, the base color will be swapped with the content color. The base
+   *   colors will set from 0 to 950 unless $invert is TRUE which will then set
+   *   from 950 to 0.
    *
    * @return array
    *   The css.
    */
-  public function getCssData($id = NULL):array;
+  public function getCssData($id = NULL, $invert = FALSE, $swap = FALSE):array;
 
 }
