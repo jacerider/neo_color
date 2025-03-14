@@ -174,3 +174,36 @@ neo_color.neo_scheme.*:
     weight:
       type: integer
       label: 'Weight'
+
+field.widget.settings.neo_scheme:
+  type: mapping
+  label: 'Color scheme field display format settings'
+  mapping:
+    allow_dark:
+      type: boolean
+      label: 'Allow dark'
+    allow_color:
+      type: boolean
+      label: 'Allow color'
+    include:
+      type: sequence
+      label: Includes
+      nullable: true
+      sequence:
+        type: string
+        label: 'Include'
+    exclude:
+      type: sequence
+      label: Excludes
+      nullable: true
+      sequence:
+        type: string
+        label: 'Exclude'
+
+field.value.neo_scheme:
+  type: mapping
+  label: 'Color scheme value'
+  mapping:
+    target_id:
+      type: string
+      label: 'Target ID'
