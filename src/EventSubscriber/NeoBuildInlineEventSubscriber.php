@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\neo_color\EventSubscriber;
 
@@ -20,7 +20,7 @@ class NeoBuildInlineEventSubscriber implements EventSubscriberInterface {
    * Constructs a new NeoBuildEventSubscriber object.
    */
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager
+    private readonly EntityTypeManagerInterface $entityTypeManager,
   ) {
 
   }
