@@ -51,6 +51,45 @@ final class Scheme extends FormElementBase {
   }
 
   /**
+   * Retrieves a list of scheme options based on specified criteria.
+   *
+   * @param bool $dark
+   *   (Optional) Whether to include dark schemes. Defaults to TRUE.
+   * @param bool $color
+   *   (Optional) Whether to include colorized schemes. Defaults to TRUE.
+   * @param array $include
+   *   (Optional) An array of scheme IDs to explicitly include. Defaults to an
+   *   empty array.
+   * @param array $exclude
+   *   (Optional) An array of scheme IDs to explicitly exclude. Defaults to an
+   *   empty array.
+   *
+   * @return \Drupal\neo_color\SchemeInterface[]
+   *   An array of scheme entities that match the specified criteria.
+   */
+  public static function getSchemes(bool $dark = TRUE, bool $color = TRUE, array $include = [], array $exclude = []): array {
+    $properties = [
+      'status' => 1,
+    ];
+    if (!$dark) {
+      $properties['dark'] = 0;
+    }
+    if (!$color) {
+      $properties['colorize'] = 0;
+    }
+    /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
+    $schemes = \Drupal::entityTypeManager()->getStorage('neo_scheme')->loadByProperties($properties);
+    if (!empty($include)) {
+      $schemes = array_intersect_key($schemes, array_flip($include));
+    }
+    if (!empty($exclude)) {
+      $schemes = array_diff_key($schemes, array_flip($exclude));
+    }
+    uasort($schemes, ['Drupal\neo_color\Entity\Scheme', 'sort']);
+    return $schemes;
+  }
+
+  /**
    * Neo color element pre render callback.
    *
    * @param array $element
@@ -78,13 +117,12 @@ final class Scheme extends FormElementBase {
     }
 
     /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
-    $schemes = \Drupal::entityTypeManager()->getStorage('neo_scheme')->loadByProperties($properties);
-    if (!empty($element['#include'])) {
-      $schemes = array_intersect_key($schemes, array_flip($element['#include']));
-    }
-    if (!empty($element['#exclude'])) {
-      $schemes = array_diff_key($schemes, array_flip($element['#exclude']));
-    }
+    $schemes = self::getSchemes(
+      (bool) $element['#allow_dark'],
+      (bool) $element['#allow_color'],
+      $element['#include'] ?? [],
+      $element['#exclude'] ?? []
+    );
     switch ($element['#format']) {
       case 'class':
         foreach ($schemes as $scheme) {
@@ -95,7 +133,6 @@ final class Scheme extends FormElementBase {
         }
         break;
     }
-    uasort($schemes, ['Drupal\neo_color\Entity\Scheme', 'sort']);
     $schemeOptions = [];
     if (!$required && !$multiple) {
       $schemeOptions[''] = [
