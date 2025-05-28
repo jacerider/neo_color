@@ -29,6 +29,23 @@ function neo_color_theme(): array {
 }
 
 /**
+ * Loads a Neo color pallet by its ID.
+ *
+ * @param string $pallet_id
+ *   The ID of the pallet to load.
+ *
+ * @return \Drupal\neo_color\PalletInterface|null
+ *   Returns the pallet object if found, or NULL if not found.
+ */
+function neo_color_get_pallet($pallet_id): ?PalletInterface {
+  $scheme = \Drupal::entityTypeManager()->getStorage('neo_pallet')->load($pallet_id);
+  if ($scheme instanceof PalletInterface) {
+    return $scheme;
+  }
+  return NULL;
+}
+
+/**
  * Implements template_preprocess().
  */
 function template_preprocess_neo_pallet_preview(&$variables) {
