@@ -5,10 +5,9 @@ dependencies: {  }
 id: primary_solid
 label: 'Primary Solid'
 dark: false
-colorize: false
+colorize: true
 base: primary
 primary: primary
 secondary: primary
 accent: secondary
 weight: -6
-colorize: 1

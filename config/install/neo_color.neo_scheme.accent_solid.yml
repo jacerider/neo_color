@@ -5,7 +5,7 @@ dependencies: {  }
 id: accent_solid
 label: 'Accent Solid'
 dark: false
-colorize: 1
+colorize: true
 base: accent
 primary: accent
 secondary: accent

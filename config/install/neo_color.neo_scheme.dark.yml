@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 id: dark
-label: 'Dark'
+label: Dark
 dark: true
 colorize: false
 base: base

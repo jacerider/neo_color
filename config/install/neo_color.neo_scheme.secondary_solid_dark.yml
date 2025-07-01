@@ -5,10 +5,9 @@ dependencies: {  }
 id: secondary_solid_dark
 label: 'Secondary Solid Dark'
 dark: true
-colorize: false
+colorize: true
 base: secondary
 primary: secondary
 secondary: secondary
 accent: primary
 weight: -1
-colorize: 1
