@@ -60,10 +60,10 @@ class NeoBuildInlineEventSubscriber implements EventSubscriberInterface {
           }
         }
       }
-    }
-    foreach ($schemes as $scheme) {
-      foreach ($scheme->getCssData() as $key => $value) {
-        $event->addCssValue($key, $value, '.' . $scheme->getSelector());
+      foreach ($schemes as $scheme) {
+        foreach ($scheme->getCssData() as $key => $value) {
+          $event->addCssValue($key, $value, '.' . $scheme->getSelector());
+        }
       }
     }
     $event->addCacheTags(['config:neo_scheme_list']);
