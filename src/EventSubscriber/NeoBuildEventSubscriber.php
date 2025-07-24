@@ -36,15 +36,12 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     $pallets = $this->entityTypeManager->getStorage('neo_pallet')->loadByProperties([
       'status' => 1,
     ]);
-    $config['tailwind']['theme']['extend']['borderColor']['DEFAULT'] = 'rgb(var(--color-base-300) / <alpha-value>)';
+    $config['tailwind']['theme']['extend']['textColor']['base']['DEFAULT'] = NULL;
+    // $config['tailwind']['theme']['extend']['borderColor']['DEFAULT'] = 'rgb(var(--color-base-300) / <alpha-value>)';
     foreach ($pallets as $pallet) {
       $id = $pallet->id();
-      if ($id !== 'base') {
-        // The 'base' pallet does not get a DEFAULT color as it adds color when
-        // using the text-base utility (we only want it to impact font size).
-        $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id) / <alpha-value>)";
-        $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content) / <alpha-value>)";
-      }
+      $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id) / <alpha-value>)";
+      $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content) / <alpha-value>)";
       foreach ($pallet->getShades() as $shadeId => $shade) {
         $config['tailwind']['theme']['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId) / <alpha-value>)";
         $config['tailwind']['theme']['colors'][$id . '-content'][$shadeId] = "rgb(var(--color-$id-content-$shadeId) / <alpha-value>)";
