@@ -126,7 +126,7 @@ final class Color extends FormElementBase {
       '#neo_style' => 'inline_elements',
       '#options' => $palletOptions,
       '#required' => !empty($element['#required']),
-      '#default_value' => $defaultPallet,
+      '#default_value' => $defaultPallet ?: '',
       '#ajax' => [
         'callback' => [self::class, 'ajaxCallback'],
         'wrapper' => $element['#id'],
