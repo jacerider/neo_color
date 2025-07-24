@@ -215,23 +215,18 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCssData($id = NULL, $invert = FALSE, $swap = FALSE, $forceContentColors = FALSE):array {
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE):array {
     $css = [];
     $id = $id ?? $this->id();
     $shades = $this->getShades();
     foreach ($shades as $shadeId => $shade) {
-      if ($invert) {
+      if ($dark) {
         $pos = array_search($shadeId, PalletInterface::SHADES);
         $shade = $shades[array_reverse(PalletInterface::SHADES)[$pos]];
       }
       $rgb = implode(' ', $shade->getRgb());
-      $rgbContent = implode(' ', $forceContentColors ? $shades[0]->getContentRgb() : $shade->getContentRgb());
-
-      if ($shadeId == 500) {
-        $css["--color-$id"] = $swap ? (implode(' ', $invert ? $shades[950]->getRgb() : $shades[0]->getRgb())) : $rgb;
-        $css["--color-$id-content"] = $swap ? $rgb : $rgbContent;
-      }
-      $css["--color-$id-$shadeId"] = $swap ? (implode(' ', $invert ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb())) : $rgb;
+      $rgbContent = implode(' ', $shade->getContentRgb());
+      $css["--color-$id-$shadeId"] = $swap ? (implode(' ', $dark ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb())) : $rgb;
       $css["--color-$id-content-$shadeId"] = $swap ? $rgb : $rgbContent;
       if ($id === 'base') {
         [$r, $g, $b] = sscanf($rgb, '%d %d %d');
@@ -240,6 +235,24 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
         $b = round(max(0, $b * 0.65));
         $css["--color-shadow-$shadeId"] = "$r $g $b";
       }
+    }
+    // Special handling for base pallet. Sets the base color appropriately
+    // based on the dark and colorize settings.
+    $baseShade = NULL;
+    if ($id === 'base') {
+      $baseShade = match(TRUE) {
+        $color => $shades[500],
+        $dark => $shades[950],
+        default => $shades[0]
+      };
+    }
+    else {
+      // For other palettes, use shade 500 by default.
+      $baseShade = $swap ? ($dark ? $shades[500] : $shades[0]) : $shades[500];
+    }
+    if ($baseShade) {
+      $css["--color-$id"] = implode(' ', $baseShade->getRgb());
+      $css["--color-$id-content"] = implode(' ', $baseShade->getContentRgb());
     }
     return $css;
   }
