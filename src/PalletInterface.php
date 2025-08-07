@@ -98,6 +98,17 @@ interface PalletInterface extends ConfigEntityInterface {
   public function getShades();
 
   /**
+   * Get the shades.
+   *
+   * @param bool $dark
+   *   If TRUE, the shades will be reversed. 0 will be 950, 950 will be 0.
+   *
+   * @return \Drupal\neo_color\Shade[]
+   *   The shades.
+   */
+  public function getColoredShades(bool $dark = FALSE): array;
+
+  /**
    * Get a shade.
    *
    * @return \Drupal\neo_color\Shade|null
@@ -157,16 +168,19 @@ interface PalletInterface extends ConfigEntityInterface {
    *
    * @param string|null $id
    *   An optional override of the pallet id.
-   * @param bool $invert
+   * @param bool $dark
    *   If TRUE, the shade colors will be reversed. 0 will be 950, 950 will be 0.
+   * @param bool $color
+   *   If TRUE, the shades will be shifted to start with 500 and end with 50 or
+   *   950 depending on $dark.
    * @param bool $swap
    *   If TRUE, the base color will be swapped with the content color. The base
-   *   colors will set from 0 to 950 unless $invert is TRUE which will then set
+   *   colors will set from 0 to 950 unless $dark is TRUE which will then set
    *   from 950 to 0.
    *
    * @return array
    *   The css.
    */
-  public function getCssData($id = NULL, $invert = FALSE, $swap = FALSE):array;
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE):array;
 
 }

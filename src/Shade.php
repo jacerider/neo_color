@@ -176,7 +176,7 @@ class Shade {
           break;
       }
     }
-    return [round($h), round($s * 100), round($l * 100)];
+    return ['h' => round($h), 's' => round($s * 100), 'l' => round($l * 100)];
   }
 
 }

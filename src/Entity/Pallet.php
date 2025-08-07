@@ -99,20 +99,20 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getShades() {
+  public function getShades(): array {
     if (!isset($this->shadeReferences)) {
       $shades = $this->shades ?? [];
+      // The 0 shade is always white.
+      $shades[0] = [
+        'color' => '#ffffff',
+        'dark' => TRUE,
+      ];
       $darkHex = $this->getContentDarkHex();
       $lightHex = $this->getContentLightHex();
       $nums = PalletInterface::SHADES;
       array_unshift($nums, 0);
       foreach ($nums as $shade) {
         $shade = (string) $shade;
-        if ($shade === '0') {
-          // The 0 shade is always white.
-          $shades[$shade]['color'] = '#ffffff';
-          $shades[$shade]['dark'] = TRUE;
-        }
         $color = $shades[$shade]['color'] ?? PalletInterface::DEFAULT_COLOR;
         $dark = !empty($shades[$shade]['dark']) ?? TRUE;
         $content = $dark ? $darkHex : $lightHex;
@@ -120,6 +120,65 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       }
     }
     return $this->shadeReferences;
+  }
+
+  /**
+   * Get the colored shades.
+   */
+  public function getColoredShades(bool $dark = FALSE): array {
+    $shades = $this->shades ?? [];
+    // The 0 shade is always white.
+    $shades[0] = [
+      'color' => '#ffffff',
+      'dark' => TRUE,
+    ];
+
+    $shadeReferences = [];
+    $newShades = ['0' => $shades['500']];
+    $shadeMap = $dark ? [
+      '50' => ['500', '600'],
+      '100' => '600',
+      '200' => ['600', '700'],
+      '300' => '700',
+      '400' => ['700', '800'],
+      '500' => '50',
+      '600' => ['50', '100'],
+      '700' => '100',
+      '800' => ['100', '200'],
+      '900' => '200',
+      '950' => ['200', '300'],
+    ] : [
+      '50' => ['500', '400'],
+      '100' => '400',
+      '200' => ['400', '300'],
+      '300' => '300',
+      '400' => ['300', '200'],
+      '500' => '200',
+      '600' => ['200', '100'],
+      '700' => '100',
+      '800' => ['100', '50'],
+      '900' => '50',
+      '950' => ['50', '0'],
+    ];
+    foreach ($shadeMap as $targetShade => $sourceShades) {
+      if (is_array($sourceShades)) {
+        [$color1, $color2] = $sourceShades;
+        $newShades[$targetShade] = [
+          'color' => $this->interpolateHexColors($shades[$color1]['color'], $shades[$color2]['color']),
+          'dark' => $shades[$color1]['dark'],
+        ];
+      }
+      else {
+        $newShades[$targetShade] = $shades[$sourceShades];
+      }
+    }
+    $darkHex = $this->getContentDarkHex();
+    $lightHex = $this->getContentLightHex();
+    foreach ($newShades as $shadeId => $shade) {
+      $dark = !empty($shade['dark']);
+      $shadeReferences[$shadeId] = new Shade((string) $shadeId, $shade['color'], $dark ? $darkHex : $lightHex, $dark);
+    }
+    return $shadeReferences;
   }
 
   /**
@@ -224,10 +283,14 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
         $pos = array_search($shadeId, PalletInterface::SHADES);
         $shade = $shades[array_reverse(PalletInterface::SHADES)[$pos]];
       }
-      $rgb = implode(' ', $shade->getRgb());
-      $rgbContent = implode(' ', $shade->getContentRgb());
-      $css["--color-$id-$shadeId"] = $swap ? (implode(' ', $dark ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb())) : $rgb;
-      $css["--color-$id-content-$shadeId"] = $swap ? $rgb : $rgbContent;
+      $rgb = implode(' ', $swap ? ($dark ? $shades[0]->getRgb() : $shades[950]->getRgb()) : $shade->getRgb());
+      $rgbContent = implode(' ', $swap ? ($dark ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb()) : $shade->getContentRgb());
+      $css["--color-$id-$shadeId"] = $rgb;
+      $css["--color-$id-content-$shadeId"] = $rgbContent;
+      if ($shadeId == 500) {
+        $css["--color-$id"] = $rgb;
+        $css["--color-$id-content"] = $rgbContent;
+      }
       if ($id === 'base') {
         [$r, $g, $b] = sscanf($rgb, '%d %d %d');
         $r = round(max(0, $r * 0.65));
@@ -236,25 +299,43 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
         $css["--color-shadow-$shadeId"] = "$r $g $b";
       }
     }
-    // Special handling for base pallet. Sets the base color appropriately
-    // based on the dark and colorize settings.
-    $baseShade = NULL;
-    if ($id === 'base') {
-      $baseShade = match(TRUE) {
-        $color => $shades[500],
-        $dark => $shades[950],
-        default => $shades[0]
-      };
-    }
-    else {
-      // For other palettes, use shade 500 by default.
-      $baseShade = $swap ? ($dark ? $shades[500] : $shades[0]) : $shades[500];
-    }
-    if ($baseShade) {
-      $css["--color-$id"] = implode(' ', $baseShade->getRgb());
-      $css["--color-$id-content"] = implode(' ', $baseShade->getContentRgb());
-    }
     return $css;
+  }
+
+  /**
+   * Interpolate between two hex colors.
+   *
+   * @param string $color1
+   *   The first color in hex format.
+   * @param string $color2
+   *   The second color in hex format.
+   * @param float $factor
+   *   The interpolation factor (0.0 to 1.0).
+   *
+   * @return string
+   *   The interpolated color in hex format.
+   */
+  protected function interpolateHexColors($color1, $color2, $factor = 0.5) {
+    // Remove # if present.
+    $color1 = ltrim($color1, '#');
+    $color2 = ltrim($color2, '#');
+
+    // Convert hex to RGB.
+    $r1 = hexdec(substr($color1, 0, 2));
+    $g1 = hexdec(substr($color1, 2, 2));
+    $b1 = hexdec(substr($color1, 4, 2));
+
+    $r2 = hexdec(substr($color2, 0, 2));
+    $g2 = hexdec(substr($color2, 2, 2));
+    $b2 = hexdec(substr($color2, 4, 2));
+
+    // Interpolate each channel.
+    $r = round($r1 + ($r2 - $r1) * $factor);
+    $g = round($g1 + ($g2 - $g1) * $factor);
+    $b = round($b1 + ($b2 - $b1) * $factor);
+
+    // Convert back to hex and format.
+    return sprintf('#%02x%02x%02x', $r, $g, $b);
   }
 
   /**
