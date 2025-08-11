@@ -23,7 +23,7 @@ Each pallet has the following shades:
 These shades can be used like:
 
 ```html
-<div class="bg-primary-500 text-primary-content-500" />
+<div class="bg-primary-500 text-primary-500-content" />
 ```
 
 ## The "0" base shade

@@ -37,14 +37,16 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
       'status' => 1,
     ]);
     $config['tailwind']['theme']['extend']['textColor']['base']['DEFAULT'] = NULL;
-    // $config['tailwind']['theme']['extend']['borderColor']['DEFAULT'] = 'rgb(var(--color-base-300) / <alpha-value>)';
     foreach ($pallets as $pallet) {
       $id = $pallet->id();
       $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id) / <alpha-value>)";
       $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content) / <alpha-value>)";
       foreach ($pallet->getShades() as $shadeId => $shade) {
         $config['tailwind']['theme']['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId) / <alpha-value>)";
-        $config['tailwind']['theme']['colors'][$id . '-content'][$shadeId] = "rgb(var(--color-$id-content-$shadeId) / <alpha-value>)";
+        $config['tailwind']['theme']['colors'][$id][$shadeId . '-content'] = "rgb(var(--color-$id-$shadeId-content) / <alpha-value>)";
+        if ($id === 'base') {
+          $config['tailwind']['theme']['colors']['shadow'][$shadeId] = "rgb(var(--color-shadow-$shadeId) / <alpha-value>)";
+        }
       }
     }
 

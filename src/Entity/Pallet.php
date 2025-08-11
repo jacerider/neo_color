@@ -123,65 +123,6 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   }
 
   /**
-   * Get the colored shades.
-   */
-  public function getColoredShades(bool $dark = FALSE): array {
-    $shades = $this->shades ?? [];
-    // The 0 shade is always white.
-    $shades[0] = [
-      'color' => '#ffffff',
-      'dark' => TRUE,
-    ];
-
-    $shadeReferences = [];
-    $newShades = ['0' => $shades['500']];
-    $shadeMap = $dark ? [
-      '50' => ['500', '600'],
-      '100' => '600',
-      '200' => ['600', '700'],
-      '300' => '700',
-      '400' => ['700', '800'],
-      '500' => '50',
-      '600' => ['50', '100'],
-      '700' => '100',
-      '800' => ['100', '200'],
-      '900' => '200',
-      '950' => ['200', '300'],
-    ] : [
-      '50' => ['500', '400'],
-      '100' => '400',
-      '200' => ['400', '300'],
-      '300' => '300',
-      '400' => ['300', '200'],
-      '500' => '200',
-      '600' => ['200', '100'],
-      '700' => '100',
-      '800' => ['100', '50'],
-      '900' => '50',
-      '950' => ['50', '0'],
-    ];
-    foreach ($shadeMap as $targetShade => $sourceShades) {
-      if (is_array($sourceShades)) {
-        [$color1, $color2] = $sourceShades;
-        $newShades[$targetShade] = [
-          'color' => $this->interpolateHexColors($shades[$color1]['color'], $shades[$color2]['color']),
-          'dark' => $shades[$color1]['dark'],
-        ];
-      }
-      else {
-        $newShades[$targetShade] = $shades[$sourceShades];
-      }
-    }
-    $darkHex = $this->getContentDarkHex();
-    $lightHex = $this->getContentLightHex();
-    foreach ($newShades as $shadeId => $shade) {
-      $dark = !empty($shade['dark']);
-      $shadeReferences[$shadeId] = new Shade((string) $shadeId, $shade['color'], $dark ? $darkHex : $lightHex, $dark);
-    }
-    return $shadeReferences;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getShade($shade) {
@@ -278,16 +219,21 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     $css = [];
     $id = $id ?? $this->id();
     $shades = $this->getShades();
+    if ($dark) {
+      $shades = $this->reverseShades($shades);
+    }
+    if ($color && $id === 'base') {
+      $shades = $this->scaleShades($shades);
+    }
+    elseif ($swap) {
+      $shades = $this->compressShades($shades);
+    }
     foreach ($shades as $shadeId => $shade) {
-      if ($dark) {
-        $pos = array_search($shadeId, PalletInterface::SHADES);
-        $shade = $shades[array_reverse(PalletInterface::SHADES)[$pos]];
-      }
-      $rgb = implode(' ', $swap ? ($dark ? $shades[0]->getRgb() : $shades[950]->getRgb()) : $shade->getRgb());
-      $rgbContent = implode(' ', $swap ? ($dark ? $shades[0]->getContentRgb() : $shades[950]->getContentRgb()) : $shade->getContentRgb());
+      $rgb = implode(' ', $shade->getRgb());
+      $rgbContent = implode(' ', $shade->getContentRgb());
       $css["--color-$id-$shadeId"] = $rgb;
-      $css["--color-$id-content-$shadeId"] = $rgbContent;
-      if ($shadeId == 500) {
+      $css["--color-$id-$shadeId-content"] = $rgbContent;
+      if (($color && $shadeId === 0) || (!$color && $shadeId === 500)) {
         $css["--color-$id"] = $rgb;
         $css["--color-$id-content"] = $rgbContent;
       }
@@ -300,6 +246,165 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       }
     }
     return $css;
+  }
+
+  /**
+   * Compress the shades.
+   *
+   * @param \Drupal\neo_color\Shade[] $shades
+   *   The shades to compress.
+   *
+   * @return \Drupal\neo_color\Shade[]
+   *   The compressed shades.
+   */
+  protected function compressShades(array $shades): array {
+    $scaled = [];
+    $shadeMap = [
+      0 => 0,
+      50 => 0,
+      100 => 0,
+      200 => 0,
+      300 => 0,
+      400 => 0,
+      500 => 0,
+      600 => [100, 200, 0.35],
+      700 => 200,
+      800 => [200, 300, 0.5],
+      900 => [300, 400, 0.5],
+      950 => 400,
+    ];
+    foreach ($shadeMap as $targetShade => $sourceShades) {
+      if (is_array($sourceShades)) {
+        [$color1, $color2, $factor] = $sourceShades;
+        $scaled[$targetShade] = new Shade((string) $targetShade, $this->interpolateHexColors($shades[$color1]->getHex(), $shades[$color2]->getHex(), $factor), $shades[$color1]->getContentHex(), $shades[$color1]->isDark());
+      }
+      else {
+        $scaled[$targetShade] = $shades[$sourceShades];
+      }
+    }
+    return $scaled;
+  }
+
+  /**
+   * Scale the shades.
+   *
+   * @param \Drupal\neo_color\Shade[] $shades
+   *   The shades to scale.
+   *
+   * @return \Drupal\neo_color\Shade[]
+   *   The scaled shades.
+   */
+  protected function scaleShades(array $shades): array {
+    $scaled = [];
+    $shadeMap = [
+      0 => 500,
+      50 => [500, 400, 0.35],
+      100 => [500, 400, 0.65],
+      200 => 400,
+      300 => [400, 300, 0.35],
+      400 => [400, 300, 0.65],
+      500 => 300,
+      600 => [300, 200, 0.5],
+      700 => 200,
+      800 => [200, 100, 0.5],
+      900 => 100,
+      950 => 50,
+    ];
+    foreach ($shadeMap as $targetShade => $sourceShades) {
+      if (is_array($sourceShades)) {
+        [$color1, $color2, $factor] = $sourceShades;
+        $scaled[$targetShade] = new Shade((string) $targetShade, $this->interpolateHexColors($shades[$color1]->getHex(), $shades[$color2]->getHex(), $factor), $shades[$color1]->getContentHex(), $shades[$color1]->isDark());
+      }
+      else {
+        $scaled[$targetShade] = $shades[$sourceShades];
+      }
+    }
+    return $scaled;
+  }
+
+  /**
+   * Reverse the shades.
+   *
+   * @param \Drupal\neo_color\Shade[] $shades
+   *   The shades to reverse.
+   *
+   * @return \Drupal\neo_color\Shade[]
+   *   The reversed shades.
+   */
+  protected function reverseShades(array $shades): array {
+    return [
+      0 => new Shade('0', '#000000', '#ffffff', TRUE),
+      50 => $shades[950],
+      100 => $shades[900],
+      200 => $shades[800],
+      300 => $shades[700],
+      400 => $shades[600],
+      500 => $shades[500],
+      600 => $shades[400],
+      700 => $shades[300],
+      800 => $shades[200],
+      900 => $shades[100],
+      950 => $shades[50],
+    ];
+  }
+
+  /**
+   * Get the colored shades.
+   */
+  public function getColoredShades(bool $dark = FALSE): array {
+    $shades = $this->shades ?? [];
+    // The 0 shade is always white.
+    $shades[0] = [
+      'color' => '#ffffff',
+      'dark' => TRUE,
+    ];
+
+    $shadeReferences = [];
+    $newShades = ['0' => $shades['500']];
+    $shadeMap = $dark ? [
+      '50' => ['500', '600'],
+      '100' => '600',
+      '200' => ['600', '700'],
+      '300' => '700',
+      '400' => ['700', '800'],
+      '500' => '50',
+      '600' => ['50', '100'],
+      '700' => '100',
+      '800' => ['100', '200'],
+      '900' => '200',
+      '950' => ['200', '300'],
+    ] : [
+      '50' => ['500', '400'],
+      '100' => '400',
+      '200' => ['400', '300'],
+      '300' => '300',
+      '400' => ['300', '200'],
+      '500' => '200',
+      '600' => ['200', '100'],
+      '700' => '100',
+      '800' => ['100', '50'],
+      '900' => '50',
+      '950' => ['50', '0'],
+    ];
+    foreach ($shadeMap as $targetShade => $sourceShades) {
+      if (is_array($sourceShades)) {
+        [$color1, $color2] = $sourceShades;
+        $newShades[$targetShade] = [
+          'color' => $this->interpolateHexColors($shades[$color1]['color'], $shades[$color2]['color']),
+          'dark' => $shades[$color1]['dark'],
+        ];
+      }
+      else {
+        $newShades[$targetShade] = $shades[$sourceShades];
+      }
+    }
+    $darkHex = $this->getContentDarkHex();
+    $lightHex = $this->getContentLightHex();
+    foreach ($newShades as $shadeId => $shade) {
+      $dark = !empty($shade['dark']);
+      $shadeReferences[$shadeId] = new Shade((string) $shadeId, $shade['color'], $dark ? $darkHex : $lightHex, $dark);
+    }
+    return $shadeReferences;
   }
 
   /**

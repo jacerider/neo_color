@@ -157,7 +157,7 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
     $isColor = $this->get('colorize');
     foreach ($pallets as $id => $pallet) {
       $isBase = $id === 'base';
-      $swap = !$isBase && $pallets['base']->id() === $pallet->id();
+      $swap = !$isBase && $isColor && $pallets['base']->id() === $pallet->id();
       $palletCss = $pallet->getCssData($id, $isDark, $isColor, $swap);
       foreach ($palletCss as $key => $value) {
         $css[$key] = $value;
