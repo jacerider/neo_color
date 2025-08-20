@@ -25,52 +25,66 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Subscribe to the user login event dispatched.
+   * Subscribe to the Neo build event dispatched.
    *
    * @param \Drupal\neo_build\Event\NeoBuildEvent $event
    *   The neo build event.
    */
   public function onBuild(NeoBuildEvent $event) {
-    $config = $event->getConfig();
+    $collection = $event->getCollection();
     /** @var \Drupal\neo_color\PalletInterface[] $pallets */
     $pallets = $this->entityTypeManager->getStorage('neo_pallet')->loadByProperties([
       'status' => 1,
     ]);
-    $config['tailwind']['theme']['extend']['textColor']['base']['DEFAULT'] = NULL;
+
+    $theme = [];
+    // Remove all default tailwind colors.
+    $collection->addTailwindThemeItem('--color-*', 'initial', 'before');
+    $collection->addTailwindThemeItem('--color-inherit', 'inherit');
+    $collection->addTailwindThemeItem('--color-current', 'currentColor');
+    $collection->addTailwindThemeItem('--color-transparent', 'transparent');
+    $collection->addTailwindThemeItem('--color-white', 'rgb(var(--color-base-0))');
+    $collection->addTailwindThemeItem('--color-white-content', 'rgb(var(--color-base-950))');
+    $collection->addTailwindThemeItem('--color-black', 'rgb(var(--color-base-950))');
+    $collection->addTailwindThemeItem('--color-black-content', 'rgb(var(--color-base-0))');
     foreach ($pallets as $pallet) {
       $id = $pallet->id();
-      $config['tailwind']['theme']['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id) / <alpha-value>)";
-      $config['tailwind']['theme']['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content) / <alpha-value>)";
+      $theme['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id))";
+      $theme['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content))";
       foreach ($pallet->getShades() as $shadeId => $shade) {
-        $config['tailwind']['theme']['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId) / <alpha-value>)";
-        $config['tailwind']['theme']['colors'][$id][$shadeId . '-content'] = "rgb(var(--color-$id-$shadeId-content) / <alpha-value>)";
+        $theme['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId))";
+        $theme['colors'][$id][$shadeId . '-content'] = "rgb(var(--color-$id-$shadeId-content))";
         if ($id === 'base') {
-          $config['tailwind']['theme']['colors']['shadow'][$shadeId] = "rgb(var(--color-shadow-$shadeId) / <alpha-value>)";
+          $theme['colors']['shadow'][$shadeId] = "rgb(var(--color-shadow-$shadeId))";
         }
       }
     }
+    $collection->addTailwindTheme($theme);
 
     /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
     $schemes = $this->entityTypeManager->getStorage('neo_scheme')->loadByProperties([
       'status' => 1,
     ]);
+
+    $variants = [];
     foreach ($schemes as $scheme) {
       $selector = $scheme->getSelector();
       $key = str_replace('scheme-', '', $selector);
-      $config['tailwind']['variants'][$key][] = '.' . $selector . ' &';
-      $config['tailwind']['variants'][$key][] = '&.' . $selector;
+      $variants[$key][] = '.' . $selector . ' &';
+      $variants[$key][] = '&.' . $selector;
       $isDark = $scheme->get('dark');
       $isColor = $scheme->get('colorize');
       if ($isDark) {
-        $config['tailwind']['variants']['dark'][] = '.' . $selector . ' &';
-        $config['tailwind']['variants']['dark'][] = '&.' . $selector;
+        $variants['dark'][] = '.' . $selector . ' &';
+        $variants['dark'][] = '&.' . $selector;
       }
       if ($isColor) {
-        $config['tailwind']['variants']['color'][] = '.' . $selector . ' &';
-        $config['tailwind']['variants']['color'][] = '&.' . $selector;
+        $variants['color'][] = '.' . $selector . ' &';
+        $variants['color'][] = '&.' . $selector;
       }
     }
-    $event->setConfig($config);
+    $collection->addTailwindVariants($variants);
+
   }
 
   /**

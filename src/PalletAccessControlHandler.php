@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\neo_build\Build;
+use Drupal\neo_build\NeoBuild;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,7 +21,7 @@ final class PalletAccessControlHandler extends EntityAccessControlHandler implem
   /**
    * The build service.
    *
-   * @var \Drupal\neo_build\Build
+   * @var \Drupal\neo_build\NeoBuild
    */
   protected $build;
 
@@ -30,10 +30,10 @@ final class PalletAccessControlHandler extends EntityAccessControlHandler implem
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\neo_build\Build $build
+   * @param \Drupal\neo_build\NeoBuild $build
    *   The build service.
    */
-  public function __construct(EntityTypeInterface $entity_type, Build $build) {
+  public function __construct(EntityTypeInterface $entity_type, NeoBuild $build) {
     parent::__construct($entity_type);
     $this->build = $build;
   }

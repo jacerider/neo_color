@@ -26,7 +26,7 @@ class NeoBuildInlineEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Subscribe to the user login event dispatched.
+   * Subscribe to the Neo build event dispatched.
    *
    * We inject the CSS variables directly into the DOM so that we do not need
    * to wait for the build to complete before the CSS is applied.
@@ -62,6 +62,12 @@ class NeoBuildInlineEventSubscriber implements EventSubscriberInterface {
       }
       foreach ($schemes as $scheme) {
         foreach ($scheme->getCssData() as $key => $value) {
+          if ($key === '--color-base-0') {
+            $event->addCssValue('--background-color-default', 'rgb(' . $value . ')', '.' . $scheme->getSelector());
+          }
+          if ($key === '--color-base-0-content') {
+            $event->addCssValue('--text-color-default', 'rgb(' . $value . ')', '.' . $scheme->getSelector());
+          }
           $event->addCssValue($key, $value, '.' . $scheme->getSelector());
         }
       }
