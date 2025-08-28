@@ -56,7 +56,7 @@ function template_preprocess_neo_pallet_preview(&$variables) {
     $variables['content_hex'] = $shade->getContentHex();
     $variables['rgb'] = implode(', ', $shade->getRgb());
     $hsl = $shade->getHsl();
-    $variables['hsl'] = 'hsl(' . $hsl[0] . ', ' . $hsl[1] . '%, ' . $hsl[2] . '%)';
+    $variables['hsl'] = 'hsl(' . $hsl['h'] . ', ' . $hsl['s'] . '%, ' . $hsl['l'] . '%)';
     $variables['shades'] = $pallet->getShades();
   }
 }
