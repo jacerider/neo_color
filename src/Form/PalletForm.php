@@ -7,7 +7,7 @@ namespace Drupal\neo_color\Form;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\neo_build\Build;
+use Drupal\neo_build\NeoBuild;
 use Drupal\neo_color\Entity\Pallet;
 use Drupal\neo_color\PalletInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,9 +20,9 @@ final class PalletForm extends EntityForm implements ContainerInjectionInterface
   /**
    * The build service.
    *
-   * @var \Drupal\neo_build\Build
+   * @var \Drupal\neo_build\NeoBuild
    */
-  protected Build $build;
+  protected NeoBuild $build;
 
   /**
    * The entity being used by this form.
@@ -34,10 +34,10 @@ final class PalletForm extends EntityForm implements ContainerInjectionInterface
   /**
    * Constructs a new ContactFormEditForm.
    *
-   * @param \Drupal\neo_build\Build $build
+   * @param \Drupal\neo_build\NeoBuild $build
    *   The build service.
    */
-  public function __construct(Build $build) {
+  public function __construct(NeoBuild $build) {
     $this->build = $build;
   }
 
