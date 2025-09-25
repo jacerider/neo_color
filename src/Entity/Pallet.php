@@ -233,7 +233,7 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       $rgbContent = implode(' ', $shade->getContentRgb());
       $css["--color-$id-$shadeId"] = $rgb;
       $css["--color-$id-$shadeId-content"] = $rgbContent;
-      if (($color && $shadeId === 0) || (!$color && $shadeId === 500)) {
+      if (($color && $shadeId === 950) || (!$color && $shadeId === 500)) {
         $css["--color-$id"] = $rgb;
         $css["--color-$id-content"] = $rgbContent;
       }
