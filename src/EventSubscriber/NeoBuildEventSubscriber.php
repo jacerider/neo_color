@@ -66,7 +66,16 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
       'status' => 1,
     ]);
 
-    $variants = [];
+    $variants = [
+      'scheme' => [
+        // Selector where class starts with "scheme-*".
+        '[class^="scheme-"] &',
+        '[class*=" scheme-"] &',
+        // Selector where class contains "scheme-*".
+        '&[class^="scheme-"]',
+        '&[class*=" scheme-"]',
+      ],
+    ];
     foreach ($schemes as $scheme) {
       $selector = $scheme->getSelector();
       $key = str_replace('scheme-', '', $selector);
