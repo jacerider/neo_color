@@ -2,12 +2,15 @@ uuid: 8d350827-db11-4c5d-aeca-cc3727530904
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: 3ssuM5oPpudwfohlmfyxbDiEtJbZtB03k-09Fg6tjxE
 id: warning
 label: Warning
-dark: false
-colorize: false
-base: base
+dark: true
+colorize: true
+colorize_offset: 0
+base: warning
 primary: warning
 secondary: warning
-accent: primary
-weight: 5
+accent: warning
+weight: 8

@@ -2,12 +2,15 @@ uuid: 6826c3f2-a931-41f5-a982-e64c95cb7865
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: Nq4aUd4quC2P6BehVwPdzjTyA7Aaq5-lk4O4Au9oVSk
 id: accent_solid
 label: 'Accent Solid'
-dark: false
+dark: true
 colorize: true
+colorize_offset: 0
 base: accent
 primary: accent
 secondary: accent
 accent: primary
-weight: 2
+weight: 4

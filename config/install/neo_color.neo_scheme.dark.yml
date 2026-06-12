@@ -2,6 +2,8 @@ uuid: 81f1a0a1-a8c2-4fad-91b4-ccc4f5fd07f3
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: G-2Pxp7RnwbUV0etoHdDztD29ymyLELgH1clKGFens0
 id: dark
 label: Dark
 dark: true

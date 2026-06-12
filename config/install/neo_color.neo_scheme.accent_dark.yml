@@ -2,12 +2,15 @@ uuid: 4dd3b335-c0a7-4686-a8a0-460262c98184
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: sWPDklo6nwIlfjZn0aXO1SCVCzLYnKhlc93G2PReGp8
 id: accent_dark
 label: 'Accent Dark'
 dark: true
 colorize: false
+colorize_offset: 100
 base: base
 primary: accent
 secondary: accent
 accent: primary
-weight: 1
+weight: 3

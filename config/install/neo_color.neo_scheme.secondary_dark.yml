@@ -2,12 +2,15 @@ uuid: ffea4192-7c35-4746-a8d4-10a0d14f0c46
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: dv98bG52DAApBOXBcjT4vIBtAggvwFyWIdWIyud0cUQ
 id: secondary_dark
 label: 'Secondary Dark'
 dark: true
 colorize: false
+colorize_offset: 100
 base: base
 primary: secondary
 secondary: secondary
 accent: primary
-weight: -3
+weight: -2

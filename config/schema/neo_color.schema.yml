@@ -159,6 +159,9 @@ neo_color.neo_scheme.*:
     colorize:
       type: boolean
       label: 'Colorize'
+    colorize_offset:
+      type: integer
+      label: 'Colorize offset'
     base:
       type: string
       label: 'Base Pallet'

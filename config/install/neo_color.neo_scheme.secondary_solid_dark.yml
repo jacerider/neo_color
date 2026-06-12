@@ -2,12 +2,15 @@ uuid: f613b5b6-4462-44fd-af07-897654122bf5
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: BORZFZtN6DFqGh3ezBV8KOUdzKoB6uUfaXAZDwDnKGg
 id: secondary_solid_dark
 label: 'Secondary Solid Dark'
 dark: true
 colorize: true
+colorize_offset: 100
 base: secondary
 primary: secondary
 secondary: secondary
 accent: primary
-weight: -1
+weight: 1

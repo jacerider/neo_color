@@ -2,12 +2,15 @@ uuid: 92ce6611-bcec-418c-bdfc-4692a9d8861c
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: 5p8V0BAKiGtgr4snCrpsBQwSpTA5cI8DidzXqZELah0
 id: secondary_solid
 label: 'Secondary Solid'
-dark: false
+dark: true
 colorize: true
+colorize_offset: 0
 base: secondary
 primary: secondary
 secondary: secondary
 accent: primary
-weight: -2
+weight: -1

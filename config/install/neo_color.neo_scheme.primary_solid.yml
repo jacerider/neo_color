@@ -2,10 +2,13 @@ uuid: e90309a8-d67d-41f9-8bc9-7b35a8453c71
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: G_TpT5ak5XCvFe6K3acwyvETLLnT9P4Rz7LBPfNXr44
 id: primary_solid
 label: 'Primary Solid'
-dark: false
+dark: true
 colorize: true
+colorize_offset: 0
 base: primary
 primary: primary
 secondary: primary
