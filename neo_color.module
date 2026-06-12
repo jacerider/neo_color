@@ -78,9 +78,15 @@ function template_preprocess_neo_scheme_preview(&$variables) {
   /** @var \Drupal\neo_color\SchemeInterface $scheme */
   $scheme = $variables['neo_scheme'];
   if ($scheme instanceof SchemeInterface) {
+    $variables['label'] = $scheme->label();
     $variables['dark'] = $scheme->get('dark');
     $variables['colorize'] = $scheme->get('colorize');
+    $variables['colorize_offset'] = (int) ($scheme->get('colorize_offset') ?? 100);
     $variables['selector'] = $scheme->getSelector();
+    $variables['base'] = $scheme->getBase();
+    $variables['primary'] = $scheme->getPrimary();
+    $variables['secondary'] = $scheme->getSecondary();
+    $variables['accent'] = $scheme->getAccent();
     $variables['css'] = [
       '#type' => 'html_tag',
       '#tag' => 'style',
@@ -99,12 +105,13 @@ function template_preprocess_neo_scheme_swatch(&$variables) {
   /** @var \Drupal\neo_color\SchemeInterface $scheme */
   $scheme = $variables['neo_scheme'];
   if ($scheme instanceof SchemeInterface) {
+    $variables['label'] = $scheme->label();
     $variables['dark'] = $scheme->get('dark');
     $variables['colorize'] = $scheme->get('colorize');
     $variables['selector'] = $scheme->getSelector();
     $variables['base'] = $scheme->getBase();
     $variables['primary'] = $scheme->getPrimary();
-    $variables['secondary'] = $scheme->getPrimary();
+    $variables['secondary'] = $scheme->getSecondary();
     $variables['accent'] = $scheme->getAccent();
   }
 }

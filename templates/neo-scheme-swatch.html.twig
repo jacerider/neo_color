@@ -1,11 +1,26 @@
-<div class="
-  neo-schemes-swatches {{ selector }} p-2 w-20 border rounded text-center
-  bg-default text-default border-shadow-300
-">
-  <div class="text-lg leading-none">Aa</div>
-  <div class="flex items-center justify-center mt-2 gap-2">
-    <div class="bg-primary-500 h-2 w-4 rounded"></div>
-    <div class="bg-secondary-500 h-2 w-4 rounded"></div>
-    <div class="bg-accent-500 h-2 w-4 rounded"></div>
+{#
+/**
+ * @file
+ * Compact scheme swatch for form radios: the scheme's surface with its default
+ * text pairing ("Aa"), and three separated dots for the primary / secondary /
+ * accent colors.
+ *
+ * Dots show each slot's recognizable brand hue (the scheme-scoped -500 shade)
+ * so a scheme reads as "olive / brown / red" at a glance. They are NOT filled
+ * from --btn-*-bg-color: those are tuned to stand off the surface, so on
+ * colorized schemes they collapse to near-black/near-white and lose the hue.
+ * Visibility instead comes from a ring in the surface's own text color
+ * (--text-color-default, always legible against the surface), so a dot stays a
+ * distinct chip even when its hue happens to match the surface.
+ */
+#}
+{% set dot = 'h-3.5 w-3.5 rounded-full border' %}
+{% set ring = 'border-color: color-mix(in oklab, var(--text-color-default) 60%, transparent)' %}
+<div class="neo-schemes-swatch {{ selector }} flex w-20 flex-col items-center gap-2 rounded-md border border-shadow-300 bg-default p-2 text-default" title="{{ label }}">
+  <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
+  <div class="flex items-center gap-1.5">
+    <span class="{{ dot }}" style="background-color: rgb(var(--color-primary-500)); {{ ring }}"></span>
+    <span class="{{ dot }}" style="background-color: rgb(var(--color-secondary-500)); {{ ring }}"></span>
+    <span class="{{ dot }}" style="background-color: rgb(var(--color-accent-500)); {{ ring }}"></span>
   </div>
 </div>
