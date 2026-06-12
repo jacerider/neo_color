@@ -63,6 +63,8 @@ final class SchemeForm extends EntityForm {
     $form['preview'] = [
       '#theme' => 'neo_scheme_preview',
       '#neo_scheme' => $this->entity,
+      '#prefix' => '<div class="card">',
+      '#suffix' => '</div>',
     ];
 
     $form['dark'] = [
@@ -79,10 +81,33 @@ final class SchemeForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Colorize'),
       '#default_value' => $this->entity->get('colorize'),
-      '#description' => $this->t('Alter the <em>base</em> pallet so that half of the shades will be set to a shade of <em>500</em>. The half that is altered is toggled by "Dark Mode". If <em>primary</em>, <em>secondary</em>, or <em>accent</em> pallets are set to the same value as the <em>base</em> pallet, they will use white/black as their color profile.'),
+      '#description' => $this->t('Rebuild the <em>base</em> pallet as a brand-tinted surface using the base pallet\'s <em>500</em> color. The surface still follows "Dark Mode": a light brand tint when off, a dark brand shade when on.'),
       '#ajax' => [
         'callback' => '::ajaxCallback',
         'wrapper' => 'neo-scheme',
+      ],
+    ];
+
+    $form['colorize_offset'] = [
+      '#type' => 'range',
+      '#title' => $this->t('Colorize offset'),
+      '#min' => 0,
+      '#max' => 100,
+      '#step' => 5,
+      '#default_value' => (int) ($this->entity->get('colorize_offset') ?? 100),
+      '#description' => $this->t('How far the surface is tinted away from the base pallet\'s <em>500</em> color. <em>100</em> is the full light/dark tint; <em>0</em> keeps the surface at the exact <em>500</em> color. At low values, default borders and base buttons intentionally converge toward the surface color.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="colorize"]' => ['checked' => TRUE],
+        ],
+      ],
+      // Core's ajax pre-render has no case for 'range', so the event must be
+      // set explicitly or no ajax behavior is bound at all. 'change' fires on
+      // slider release, which is the right granularity for a preview rebuild.
+      '#ajax' => [
+        'callback' => '::ajaxCallback',
+        'wrapper' => 'neo-scheme',
+        'event' => 'change',
       ],
     ];
 

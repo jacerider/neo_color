@@ -215,37 +215,175 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE):array {
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100):array {
     $css = [];
     $id = $id ?? $this->id();
-    $shades = $this->getShades();
-    if ($dark) {
-      $shades = $this->reverseShades($shades);
-    }
-    if ($color && $id === 'base') {
-      $shades = $this->scaleShades($shades);
-    }
-    elseif ($swap) {
-      $shades = $this->compressShades($shades);
-    }
+    $shades = $this->getTransformedShades($dark, $color && $id === 'base', $colorizeOffset);
+    $shadowHsl = $id === 'base' ? $this->getShadowAnchorHsl($shades) : NULL;
+    // Luminance of the scheme surface (base-0). Shadows are clamped to stay
+    // darker than this so a shadow never lightens the surface it falls on.
+    $surfaceLum = $id === 'base' ? $this->rgbLuminance($shades[0]->getRgb()) : 0.0;
+    // The bare `--color-$id` token (bg-primary, text-accent…) is always the
+    // 500 brand shade. Colorized schemes now follow the mode like normal ones
+    // (brand-tinted light/dark surface), so the brand tokens need no special
+    // casing — bg-primary is the vivid brand on every scheme.
+    $defaultShade = 500;
     foreach ($shades as $shadeId => $shade) {
       $rgb = implode(' ', $shade->getRgb());
       $rgbContent = implode(' ', $shade->getContentRgb());
       $css["--color-$id-$shadeId"] = $rgb;
       $css["--color-$id-$shadeId-content"] = $rgbContent;
-      if (($color && $shadeId === 950) || (!$color && $shadeId === 500)) {
+      if ($shadeId === $defaultShade) {
         $css["--color-$id"] = $rgb;
         $css["--color-$id-content"] = $rgbContent;
       }
       if ($id === 'base') {
-        [$r, $g, $b] = sscanf($rgb, '%d %d %d');
-        $r = round(max(0, $r * 0.65));
-        $g = round(max(0, $g * 0.65));
-        $b = round(max(0, $b * 0.65));
-        $css["--color-shadow-$shadeId"] = "$r $g $b";
+        $css["--color-shadow-$shadeId"] = $this->getShadowRgb($shade, $shadowHsl, $surfaceLum);
       }
     }
     return $css;
+  }
+
+  /**
+   * Get the hue/saturation anchor for shadow colors.
+   *
+   * Shadows take their hue and saturation from the ramp's most chromatic
+   * shade so they stay tinted with the base color. Darkening a shade's RGB
+   * directly collapses to neutral gray on near-white/desaturated shades
+   * (e.g. the light end of a colorized base ramp), which has no hue left to
+   * preserve.
+   *
+   * @param \Drupal\neo_color\Shade[] $shades
+   *   The base shade ramp.
+   *
+   * @return array
+   *   The anchor shade's HSL values (h 0-360, s 0-100, l 0-100).
+   */
+  protected function getShadowAnchorHsl(array $shades): array {
+    $anchor = NULL;
+    $maxChroma = -1;
+    foreach ($shades as $shade) {
+      $rgb = $shade->getRgb();
+      $chroma = max($rgb) - min($rgb);
+      if ($chroma > $maxChroma) {
+        $maxChroma = $chroma;
+        $anchor = $shade;
+      }
+    }
+    return $anchor->getHsl();
+  }
+
+  /**
+   * Get the shadow color for a shade as a CSS RGB triplet.
+   *
+   * A shadow must always be darker than the surface it falls on — it can never
+   * lighten anything. The color keeps the base ramp's brand hue/saturation (so
+   * shadows are tinted, never a flat gray) at a darkened lightness, then is
+   * clamped so its luminance stays below both the shade it belongs to and the
+   * scheme surface (base-0). The clamp is what fixes light/colorized schemes,
+   * where a shade's own lightness would otherwise leave the "shadow" lighter
+   * than the surface and read as a glow.
+   *
+   * @param \Drupal\neo_color\Shade $shade
+   *   The shade to compute a shadow for.
+   * @param array $anchorHsl
+   *   The anchor HSL values from getShadowAnchorHsl().
+   * @param float $surfaceLum
+   *   The luminance of the scheme surface (base-0).
+   *
+   * @return string
+   *   The shadow color as a space-separated RGB triplet.
+   */
+  protected function getShadowRgb(Shade $shade, array $anchorHsl, float $surfaceLum): string {
+    $hsl = $shade->getHsl();
+    $sat = max($hsl['s'], $anchorHsl['s']) / 100;
+    $rgb = $this->hslToRgb((float) $anchorHsl['h'], $sat, ($hsl['l'] / 100) * 0.6);
+    // Never lighter than the shade itself or the surface it falls on. Scale
+    // toward black (preserves hue) until the luminance clears the darker of
+    // the two by a clear margin so the shadow always reads as a shadow.
+    $cap = min($this->rgbLuminance($shade->getRgb()), $surfaceLum) * 0.65;
+    $lum = $this->rgbLuminance($rgb);
+    if ($lum > $cap && $lum > 0) {
+      $k = ($cap / $lum) ** (1 / 2.4);
+      $rgb = [$rgb[0] * $k, $rgb[1] * $k, $rgb[2] * $k];
+    }
+    return implode(' ', array_map(fn ($c) => (int) round($c), $rgb));
+  }
+
+  /**
+   * Get the WCAG relative luminance of an RGB triplet.
+   *
+   * @param int[] $rgb
+   *   The RGB values (0-255).
+   *
+   * @return float
+   *   The relative luminance (0.0 - 1.0).
+   */
+  protected function rgbLuminance(array $rgb): float {
+    $lin = static fn ($c) => ($c = $c / 255) <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+    return 0.2126 * $lin($rgb[0]) + 0.7152 * $lin($rgb[1]) + 0.0722 * $lin($rgb[2]);
+  }
+
+  /**
+   * Convert HSL to RGB.
+   *
+   * @param float $h
+   *   The hue (0-360).
+   * @param float $s
+   *   The saturation (0-1).
+   * @param float $l
+   *   The lightness (0-1).
+   *
+   * @return int[]
+   *   The RGB values (0-255).
+   */
+  protected function hslToRgb(float $h, float $s, float $l): array {
+    $c = (1 - abs(2 * $l - 1)) * $s;
+    $x = $c * (1 - abs(fmod($h / 60, 2) - 1));
+    $m = $l - $c / 2;
+    if ($h < 60) {
+      [$r, $g, $b] = [$c, $x, 0];
+    }
+    elseif ($h < 120) {
+      [$r, $g, $b] = [$x, $c, 0];
+    }
+    elseif ($h < 180) {
+      [$r, $g, $b] = [0, $c, $x];
+    }
+    elseif ($h < 240) {
+      [$r, $g, $b] = [0, $x, $c];
+    }
+    elseif ($h < 300) {
+      [$r, $g, $b] = [$x, 0, $c];
+    }
+    else {
+      [$r, $g, $b] = [$c, 0, $x];
+    }
+    return [
+      (int) round(($r + $m) * 255),
+      (int) round(($g + $m) * 255),
+      (int) round(($b + $m) * 255),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100): array {
+    $shades = $this->getShades();
+    if ($dark) {
+      $shades = $this->reverseShades($shades);
+    }
+    if ($scale) {
+      $shades = $this->scaleShades($shades, $dark, $colorizeOffset);
+    }
+    // Normalize to integer keys (getShades() uses string keys, the transform
+    // maps use integers) so callers can address shades numerically.
+    $normalized = [];
+    foreach ($shades as $shadeId => $shade) {
+      $normalized[(int) $shadeId] = $shade;
+    }
+    return $normalized;
   }
 
   /**
@@ -259,6 +397,8 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
    */
   protected function compressShades(array $shades): array {
     $scaled = [];
+    $lightHex = $this->getContentLightHex();
+    $darkHex = $this->getContentDarkHex();
     $shadeMap = [
       0 => 0,
       50 => 0,
@@ -276,48 +416,110 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     foreach ($shadeMap as $targetShade => $sourceShades) {
       if (is_array($sourceShades)) {
         [$color1, $color2, $factor] = $sourceShades;
-        $scaled[$targetShade] = new Shade((string) $targetShade, $this->interpolateHexColors($shades[$color1]->getHex(), $shades[$color2]->getHex(), $factor), $shades[$color1]->getContentHex(), $shades[$color1]->isDark());
+        $hex = $this->interpolateHexColors($shades[$color1]->getHex(), $shades[$color2]->getHex(), $factor);
       }
       else {
-        $scaled[$targetShade] = $shades[$sourceShades];
+        $hex = $shades[$sourceShades]->getHex();
       }
+      // Choose the content (text) color by contrast against the resulting
+      // background rather than inheriting the source shade's content.
+      $content = Shade::pickContent($hex, $lightHex, $darkHex);
+      $scaled[$targetShade] = new Shade((string) $targetShade, $hex, $content['hex'], $content['dark']);
     }
     return $scaled;
   }
 
   /**
-   * Scale the shades.
+   * Scale the base shades for a colorized scheme.
+   *
+   * Colorize turns the base ramp into a vivid brand-tinted surface that still
+   * follows light/dark mode exactly like a non-colorized scheme: a light brand
+   * tint in light mode, a dark brand shade in dark mode. The shades are
+   * pre-reversed for dark schemes, so each source shade's lightness already
+   * encodes the mode — we keep that lightness (compressed away from pure
+   * white/black so every shade still reads as the brand) and paint it with the
+   * brand 500's hue and saturation. Text is then picked by contrast per shade,
+   * just like a normal scheme, so dark mode gets light ink and light mode gets
+   * dark ink — consistent with the buttons and with non-colorized schemes.
+   *
+   * The offset controls where the SURFACE end (shade 0) of the ramp anchors:
+   * at 100 it is the full light/dark tint (0.92 / 0.10 lightness); at 0 it is
+   * the brand 500 itself. Only the surface end moves — the far (contrast) end
+   * stays pinned so cards, text and buttons keep room to work. The saturation
+   * floor relaxes toward the brand's true saturation as the offset shrinks,
+   * so an offset of 0 reproduces the exact 500 color rather than an
+   * oversaturated repaint of it.
    *
    * @param \Drupal\neo_color\Shade[] $shades
-   *   The shades to scale.
+   *   The (already mode-reversed) source shades.
+   * @param bool $dark
+   *   Whether the scheme is dark (determines which end is the surface).
+   * @param int $colorizeOffset
+   *   How far the surface is tinted away from the brand 500 shade (0-100).
    *
    * @return \Drupal\neo_color\Shade[]
    *   The scaled shades.
    */
-  protected function scaleShades(array $shades): array {
+  protected function scaleShades(array $shades, bool $dark = FALSE, int $colorizeOffset = 100): array {
     $scaled = [];
-    $shadeMap = [
-      0 => 500,
-      50 => [500, 400, 0.35],
-      100 => [500, 400, 0.65],
-      200 => 400,
-      300 => [400, 300, 0.35],
-      400 => [400, 300, 0.65],
-      500 => 300,
-      600 => [300, 200, 0.5],
-      700 => 200,
-      800 => [200, 100, 0.5],
-      900 => 100,
-      950 => 50,
-    ];
-    foreach ($shadeMap as $targetShade => $sourceShades) {
-      if (is_array($sourceShades)) {
-        [$color1, $color2, $factor] = $sourceShades;
-        $scaled[$targetShade] = new Shade((string) $targetShade, $this->interpolateHexColors($shades[$color1]->getHex(), $shades[$color2]->getHex(), $factor), $shades[$color1]->getContentHex(), $shades[$color1]->isDark());
+    $lightHex = $this->getContentLightHex();
+    $darkHex = $this->getContentDarkHex();
+    $anchor = $shades[500]->getHsl();
+    $hue = (float) $anchor['h'];
+    $factor = max(0, min(100, $colorizeOffset)) / 100;
+    $brandL = $anchor['l'] / 100;
+    $brandSat = $anchor['s'] / 100;
+    // Keep the brand's saturation, but never so washed that the surface stops
+    // reading as the brand color. The floor fades out as the offset approaches
+    // 0 so the anchored surface matches the brand's true saturation.
+    $sat = min(1.0, $brandSat + $factor * (max($brandSat, 0.45) - $brandSat));
+    // The surface (shade 0) lightness moves between the brand 500 (offset 0)
+    // and the full tint extreme (offset 100); the opposite end stays pinned.
+    if ($dark) {
+      $surfaceL = min(0.92, $brandL + $factor * (0.10 - $brandL));
+    }
+    else {
+      $surfaceL = max(0.10, $brandL + $factor * (0.92 - $brandL));
+    }
+    foreach ($shades as $shadeId => $shade) {
+      $sourceL = $shade->getHsl()['l'] / 100;
+      if ($dark) {
+        // Source shade 0 is black (L 0) and maps to the surface anchor; the
+        // ramp ascends to the light contrast end at 0.92.
+        $targetL = $surfaceL + $sourceL * (0.92 - $surfaceL);
       }
       else {
-        $scaled[$targetShade] = $shades[$sourceShades];
+        // Source shade 0 is white (L 1) and maps to the surface anchor; the
+        // ramp descends to the dark contrast end at 0.10.
+        $targetL = 0.10 + $sourceL * ($surfaceL - 0.10);
       }
+      if ((int) $shadeId === 0 && $factor <= 0) {
+        // Anchored surface: use the exact 500 hex, avoiding the integer
+        // rounding of an HSL round-trip.
+        $hex = $shades[500]->getHex();
+      }
+      else {
+        [$r, $g, $b] = $this->hslToRgb($hue, $sat, $targetL);
+        $hex = sprintf('#%02x%02x%02x', $r, $g, $b);
+      }
+      // Content follows the mode on the surface side of the ramp: dark
+      // schemes read with light ink, light schemes with dark ink. At low
+      // offsets the surface is a brand mid-tone whose luminance no longer
+      // signals the mode, and pure contrast picking diverges per brand (dark
+      // ink on a bright amber, light ink on a deep red — inconsistent
+      // siblings). The far (contrast) side keeps pure per-shade picking: a
+      // dark scheme's light far end still needs dark ink. The 2.0 guard
+      // protects schemes whose brand color can't carry the mode ink at all.
+      $farL = $dark ? 0.92 : 0.10;
+      $surfaceSide = abs($targetL - $surfaceL) <= abs($targetL - $farL);
+      $preferredHex = $dark ? $lightHex : $darkHex;
+      if ($surfaceSide && Shade::contrastRatio($hex, $preferredHex) >= 2.0) {
+        $content = ['hex' => $preferredHex, 'dark' => !$dark];
+      }
+      else {
+        $content = Shade::pickContent($hex, $lightHex, $darkHex);
+      }
+      $scaled[(int) $shadeId] = new Shade((string) $shadeId, $hex, $content['hex'], $content['dark']);
     }
     return $scaled;
   }

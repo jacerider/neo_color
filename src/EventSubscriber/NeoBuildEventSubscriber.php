@@ -59,6 +59,21 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
         }
       }
     }
+
+    // Fall back the Tailwind "gray" family scales to "base" when their pallet is
+    // not enabled, so components copied from the internet (which commonly use
+    // gray/slate/zinc/neutral/stone) render against the standardized base
+    // palette. base is scheme-scoped, so these aliases are scheme-reactive too.
+    // An enabled pallet of the same name keeps its own colors (isset guard).
+    if (isset($theme['colors']['base'])) {
+      foreach (['gray', 'slate', 'zinc', 'neutral', 'stone'] as $alias) {
+        if (!isset($pallets[$alias])) {
+          $theme['colors'][$alias] = $theme['colors']['base'];
+          $theme['colors'][$alias . '-content'] = $theme['colors']['base-content'];
+        }
+      }
+    }
+
     $collection->addTailwindTheme($theme);
 
     /** @var \Drupal\neo_color\SchemeInterface[] $schemes */
@@ -94,6 +109,55 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     }
     $collection->addTailwindVariants($variants);
 
+    // Make Tailwind Typography's `prose` follow the active color scheme.
+    //
+    // @tailwindcss/typography hardcodes slate `--tw-prose-*` values (in the
+    // `utilities` layer), so prose ignores the scheme entirely — e.g. dark
+    // slate body text rendered on a dark/solid scheme background. The base
+    // palette can't fix this: its scale runs surface -> black and does not
+    // invert on dark schemes, so the only reliably-readable foreground is
+    // `--text-color-default` (the scheme's base-0-content pairing).
+    //
+    // Scope the override to scheme containers so unscoped prose keeps the
+    // plugin's tuned defaults (no regression, and `--text-color-default` is
+    // only defined under a scheme). `!important` is required because this rule
+    // lives in the `components` layer while the values it replaces live in the
+    // higher-priority `utilities` layer — importance crosses layer boundaries,
+    // specificity alone cannot.
+    $text = 'var(--text-color-default)';
+    $border = 'var(--color-border-default)';
+    $muted = fn (int $pct) => "color-mix(in oklab, var(--text-color-default) {$pct}%, transparent)";
+    $prose = [
+      '--tw-prose-body' => $text . ' !important',
+      '--tw-prose-headings' => $text . ' !important',
+      '--tw-prose-lead' => $muted(80) . ' !important',
+      '--tw-prose-links' => 'var(--link-color, var(--text-color-default)) !important',
+      '--tw-prose-bold' => $text . ' !important',
+      '--tw-prose-counters' => $muted(70) . ' !important',
+      '--tw-prose-bullets' => $muted(45) . ' !important',
+      '--tw-prose-hr' => $border . ' !important',
+      '--tw-prose-quotes' => $text . ' !important',
+      '--tw-prose-quote-borders' => $border . ' !important',
+      '--tw-prose-captions' => $muted(70) . ' !important',
+      '--tw-prose-code' => $text . ' !important',
+      '--tw-prose-th-borders' => $border . ' !important',
+      '--tw-prose-td-borders' => $border . ' !important',
+    ];
+    // Match a scheme on an ancestor (descendant prose) or on the prose element
+    // itself, mirroring the scheme-class matching used for variants above.
+    $proseSelector = implode(', ', [
+      '[class^="scheme-"] .prose',
+      '[class*=" scheme-"] .prose',
+      '[class^="scheme-"].prose',
+      '[class*=" scheme-"].prose',
+    ]);
+    $collection->addTailwindComponents([$proseSelector => $prose]);
+
+    // Button colors inside schemes are handled by the contrast-aware
+    // `--btn[-slot]-*` variables emitted per scheme scope
+    // (see Scheme::buildButtonCssVars()), so no selector overrides are needed
+    // here — the neo_theme button utilities already resolve through those
+    // hooks with fallbacks.
   }
 
   /**

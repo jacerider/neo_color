@@ -109,6 +109,23 @@ interface PalletInterface extends ConfigEntityInterface {
   public function getColoredShades(bool $dark = FALSE): array;
 
   /**
+   * Get the shades as they render within a scheme context.
+   *
+   * @param bool $dark
+   *   If TRUE, the shades are reversed (dark scheme).
+   * @param bool $scale
+   *   If TRUE, the shades are scaled around the 500 shade (colorized base).
+   * @param int $colorizeOffset
+   *   How far the colorized surface is tinted away from the brand 500 shade
+   *   (0-100). 0 anchors the surface at the exact 500 color; 100 is the full
+   *   light/dark tint. Only used when $scale is TRUE.
+   *
+   * @return \Drupal\neo_color\Shade[]
+   *   The transformed shades, keyed by integer shade id (0-950).
+   */
+  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100): array;
+
+  /**
    * Get a shade.
    *
    * @return \Drupal\neo_color\Shade|null
@@ -177,10 +194,14 @@ interface PalletInterface extends ConfigEntityInterface {
    *   If TRUE, the base color will be swapped with the content color. The base
    *   colors will set from 0 to 950 unless $dark is TRUE which will then set
    *   from 950 to 0.
+   * @param int $colorizeOffset
+   *   How far the colorized surface is tinted away from the brand 500 shade
+   *   (0-100). 0 anchors the surface at the exact 500 color; 100 is the full
+   *   light/dark tint. Only used when $color is TRUE.
    *
    * @return array
    *   The css.
    */
-  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE):array;
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100):array;
 
 }
