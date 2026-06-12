@@ -69,3 +69,11 @@ entity.neo_scheme.delete_form:
     _title: 'Delete a scheme'
   requirements:
     _permission: 'administer neo_scheme'
+
+neo_color.scheme_preview:
+  path: '/admin/config/neo/scheme-preview'
+  defaults:
+    _title: 'Color Scheme Preview'
+    _controller: '\Drupal\neo_color\Controller\SchemePreviewController'
+  requirements:
+    _permission: 'administer neo_scheme'
