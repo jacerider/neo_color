@@ -1,0 +1,11 @@
+entity.neo_scheme.collection:
+  title: 'Schemes'
+  route_name: entity.neo_scheme.collection
+  base_route: entity.neo_scheme.collection
+  weight: -10
+
+neo_color.scheme_preview:
+  title: 'Preview'
+  route_name: neo_color.scheme_preview
+  base_route: entity.neo_scheme.collection
+  weight: -10
