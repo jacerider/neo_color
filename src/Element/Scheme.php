@@ -138,12 +138,12 @@ final class Scheme extends FormElementBase {
       $schemeOptions[''] = [
         '#type' => 'inline_template',
         '#template' => '
-        <div class="neo-schemes-swatches p-2 w-20 border border-base-200 rounded text-center bg-base-50 text-base-50-content">
-          <div class="text-lg leading-none">{{ id }}</div>
-          <div class="flex items-center justify-center mt-2 gap-2">
-            <div class="h-2 w-4 bg-primary-500 rounded"></div>
-            <div class="h-2 w-4 bg-secondary-500 rounded"></div>
-            <div class="h-2 w-4 bg-accent-500 rounded"></div>
+        <div class="neo-schemes-swatch flex w-20 flex-col items-center gap-2 rounded-md border border-base-300 bg-base-0 p-2 text-base-400" title="{{ id }}">
+          <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
+          <div class="flex items-center gap-1.5">
+            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
+            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
+            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
           </div>
         </div>
         ',
