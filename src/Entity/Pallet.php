@@ -296,16 +296,26 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
    */
   protected function getShadowRgb(Shade $shade, array $anchorHsl, float $surfaceLum): string {
     $hsl = $shade->getHsl();
-    $sat = max($hsl['s'], $anchorHsl['s']) / 100;
+    // Use the anchor's saturation only — never the shade's own. HSL saturation
+    // is numerically inflated for near-white/near-black shades (a chroma of
+    // 5/255 at L 0.99 computes as ~100% saturation), which painted a vivid
+    // brand-hue swatch where a barely-tinted shadow was expected (e.g. a warm
+    // base-50 producing a pure-orange shadow-50). The anchor is the ramp's
+    // most chromatic shade, so its saturation already carries the tint.
+    $sat = $anchorHsl['s'] / 100;
     $rgb = $this->hslToRgb((float) $anchorHsl['h'], $sat, ($hsl['l'] / 100) * 0.6);
     // Never lighter than the shade itself or the surface it falls on. Scale
     // toward black (preserves hue) until the luminance clears the darker of
     // the two by a clear margin so the shadow always reads as a shadow.
+    // Iterate: a single (cap/lum)^(1/2.4) scale assumes pure power-law sRGB,
+    // but the +0.055 linearization offset makes it undershoot — against
+    // near-black surfaces the result could end up lighter than the surface.
     $cap = min($this->rgbLuminance($shade->getRgb()), $surfaceLum) * 0.65;
     $lum = $this->rgbLuminance($rgb);
-    if ($lum > $cap && $lum > 0) {
+    for ($i = 0; $i < 8 && $lum > $cap && $lum > 0; $i++) {
       $k = ($cap / $lum) ** (1 / 2.4);
       $rgb = [$rgb[0] * $k, $rgb[1] * $k, $rgb[2] * $k];
+      $lum = $this->rgbLuminance($rgb);
     }
     return implode(' ', array_map(fn ($c) => (int) round($c), $rgb));
   }
