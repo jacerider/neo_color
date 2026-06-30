@@ -132,6 +132,17 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRawShadeHex($shade): string {
+    if ((string) $shade === '0') {
+      // The 0 shade is always white (matches getShades()).
+      return '#ffffff';
+    }
+    return $this->shades[(string) $shade]['color'] ?? PalletInterface::DEFAULT_COLOR;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getContentPalletId():string {
     return $this->content['pallet'] ?? 'base';
   }
@@ -144,7 +155,7 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     if (!$palletId) {
       return NULL;
     }
-    return $this->getContentPalletId() === $this->id() ? $this : Pallet::load($this->getContentPalletId());
+    return $palletId === $this->id() ? $this : Pallet::load($palletId);
   }
 
   /**
@@ -164,12 +175,12 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   public function getContentLightHex():string {
     $color = $this->getContentLight();
     if ($pallet = $this->getContentPallet()) {
-      if ($pallet->id() === $this->id()) {
-        $color = $this->shades[$color]['color'];
-      }
-      else {
-        $color = $pallet->getShade($color)->getHex();
-      }
+      // Read the raw configured hex rather than $pallet->getShade()->getHex().
+      // getShade() builds the full Shade ramp, which itself calls
+      // getContentLightHex()/getContentDarkHex() to pick each shade's text
+      // color — so a cross-pallet (or cyclic) content reference re-enters
+      // getShades() before $shadeReferences is set and exhausts memory.
+      $color = $pallet->getRawShadeHex($color);
     }
     return $color;
   }
@@ -191,12 +202,10 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   public function getContentDarkHex():string {
     $color = $this->getContentDark();
     if ($pallet = $this->getContentPallet()) {
-      if ($pallet->id() === $this->id()) {
-        $color = $this->shades[$color]['color'];
-      }
-      else {
-        $color = $pallet->getShade($color)->getHex();
-      }
+      // Read the raw configured hex rather than $pallet->getShade()->getHex().
+      // See getContentLightHex() for why routing through getShades() here
+      // recurses on cross-pallet (or cyclic) content references.
+      $color = $pallet->getRawShadeHex($color);
     }
     return $color;
   }
@@ -453,19 +462,22 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
    * dark ink — consistent with the buttons and with non-colorized schemes.
    *
    * The offset controls where the SURFACE end (shade 0) of the ramp anchors:
-   * at 100 it is the full light/dark tint (0.92 / 0.10 lightness); at 0 it is
-   * the brand 500 itself. Only the surface end moves — the far (contrast) end
-   * stays pinned so cards, text and buttons keep room to work. The saturation
-   * floor relaxes toward the brand's true saturation as the offset shrinks,
-   * so an offset of 0 reproduces the exact 500 color rather than an
-   * oversaturated repaint of it.
+   * at 0 it is the brand 500 itself; at 100 it is the full light/dark tint
+   * (0.92 / 0.10 lightness); ABOVE 100 it keeps pushing toward a neutral
+   * surface, reaching pure white (light) / pure black (dark) at 200. Only the
+   * surface end moves — the far (contrast) end stays pinned so cards, text and
+   * buttons keep room to work. The saturation floor relaxes toward the brand's
+   * true saturation as the offset shrinks toward 0 (so 0 reproduces the exact
+   * 500 color), and stops climbing at 100 so the >100 range only lightens the
+   * surface rather than re-saturating it.
    *
    * @param \Drupal\neo_color\Shade[] $shades
    *   The (already mode-reversed) source shades.
    * @param bool $dark
    *   Whether the scheme is dark (determines which end is the surface).
    * @param int $colorizeOffset
-   *   How far the surface is tinted away from the brand 500 shade (0-100).
+   *   How far the surface is tinted away from the brand 500 shade. 0-100 spans
+   *   exact-500 → full tint; 100-200 spans full tint → pure white/black.
    *
    * @return \Drupal\neo_color\Shade[]
    *   The scaled shades.
@@ -476,20 +488,30 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     $darkHex = $this->getContentDarkHex();
     $anchor = $shades[500]->getHsl();
     $hue = (float) $anchor['h'];
-    $factor = max(0, min(100, $colorizeOffset)) / 100;
+    $factor = max(0, $colorizeOffset) / 100;
     $brandL = $anchor['l'] / 100;
     $brandSat = $anchor['s'] / 100;
     // Keep the brand's saturation, but never so washed that the surface stops
     // reading as the brand color. The floor fades out as the offset approaches
-    // 0 so the anchored surface matches the brand's true saturation.
-    $sat = min(1.0, $brandSat + $factor * (max($brandSat, 0.45) - $brandSat));
-    // The surface (shade 0) lightness moves between the brand 500 (offset 0)
-    // and the full tint extreme (offset 100); the opposite end stays pinned.
+    // 0 so the anchored surface matches the brand's true saturation; it stops
+    // at 100 (satFactor capped) so offsets above 100 only lighten/darken.
+    $satFactor = min(1.0, $factor);
+    $sat = min(1.0, $brandSat + $satFactor * (max($brandSat, 0.45) - $brandSat));
+    // The surface (shade 0) lightness moves from the brand 500 (offset 0) to
+    // the full tint extreme (offset 100), then on to pure white/black (offset
+    // 200); the opposite end stays pinned. The 0-100 leg is unchanged, so
+    // existing schemes render identically.
     if ($dark) {
-      $surfaceL = min(0.92, $brandL + $factor * (0.10 - $brandL));
+      $surfaceL = $factor <= 1.0
+        ? min(0.92, $brandL + $factor * (0.10 - $brandL))
+        : 0.10 + ($factor - 1.0) * (0.0 - 0.10);
+      $surfaceL = max(0.0, $surfaceL);
     }
     else {
-      $surfaceL = max(0.10, $brandL + $factor * (0.92 - $brandL));
+      $surfaceL = $factor <= 1.0
+        ? max(0.10, $brandL + $factor * (0.92 - $brandL))
+        : 0.92 + ($factor - 1.0) * (1.0 - 0.92);
+      $surfaceL = min(1.0, $surfaceL);
     }
     foreach ($shades as $shadeId => $shade) {
       $sourceL = $shade->getHsl()['l'] / 100;

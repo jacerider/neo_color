@@ -16,7 +16,8 @@
 #}
 {% set dot = 'h-3.5 w-3.5 rounded-full border' %}
 {% set ring = 'border-color: color-mix(in oklab, var(--text-color-default) 60%, transparent)' %}
-<div class="neo-schemes-swatch {{ selector }} flex w-20 flex-col items-center gap-2 rounded-md border border-shadow-300 bg-default p-2 text-default" title="{{ label }}">
+{% set ring = 'border-color: rgb(var(--color-base-0-content))' %}
+<div class="neo-schemes-swatch {{ selector }} flex w-20 flex-col items-center gap-2 rounded-md border border-shadow-300 bg-base-0 p-2 text-base-0-content" title="{{ label }}">
   <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
   <div class="flex items-center gap-1.5">
     <span class="{{ dot }}" style="background-color: rgb(var(--color-primary-500)); {{ ring }}"></span>

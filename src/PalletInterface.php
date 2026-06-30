@@ -134,6 +134,23 @@ interface PalletInterface extends ConfigEntityInterface {
   public function getShade($shade);
 
   /**
+   * Get the raw configured hex for a shade without building Shade objects.
+   *
+   * Unlike getShade(), this does not build the full Shade ramp (which depends
+   * on getContentLightHex()/getContentDarkHex()), so it is safe to call from
+   * those methods when resolving a content color from another pallet. Routing
+   * that lookup through getShade()/getShades() re-enters getShades() before its
+   * cache is set and exhausts memory on cross-pallet or cyclic references.
+   *
+   * @param string|int $shade
+   *   The shade id (0-950).
+   *
+   * @return string
+   *   The configured hex color, or the default color when unset.
+   */
+  public function getRawShadeHex($shade): string;
+
+  /**
    * Get the content pallet id.
    *
    * @return string

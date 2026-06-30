@@ -54,7 +54,7 @@
         style="background: rgb(var(--color-base-200)); color: rgb(var(--color-base-200-content))">{{ dark ? 'Dark' : 'Light' }}</span>
       {% if colorize %}
         <span class="rounded-full px-2 py-0.5 font-semibold uppercase tracking-wide"
-          style="background: rgb(var(--color-base-200)); color: rgb(var(--color-base-200-content))">Colorized{% if colorize_offset < 100 %} · {{ colorize_offset }}%{% endif %}</span>
+          style="background: rgb(var(--color-base-200)); color: rgb(var(--color-base-200-content))">Colorized{% if colorize_offset != 100 %} · {{ colorize_offset }}%{% endif %}</span>
       {% endif %}
     </div>
     <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 {{ muted }}" style="font-size: 11px">

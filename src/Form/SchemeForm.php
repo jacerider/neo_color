@@ -92,10 +92,10 @@ final class SchemeForm extends EntityForm {
       '#type' => 'range',
       '#title' => $this->t('Colorize offset'),
       '#min' => 0,
-      '#max' => 100,
+      '#max' => 200,
       '#step' => 5,
       '#default_value' => (int) ($this->entity->get('colorize_offset') ?? 100),
-      '#description' => $this->t('How far the surface is tinted away from the base pallet\'s <em>500</em> color. <em>100</em> is the full light/dark tint; <em>0</em> keeps the surface at the exact <em>500</em> color. At low values, default borders and base buttons intentionally converge toward the surface color.'),
+      '#description' => $this->t('How far the surface is tinted away from the base pallet\'s <em>500</em> color. <em>0</em> keeps the surface at the exact <em>500</em> color; <em>100</em> is the full light/dark tint; <em>200</em> pushes all the way to a pure white (light) / black (dark) surface. At low values, default borders and base buttons intentionally converge toward the surface color.'),
       '#states' => [
         'visible' => [
           ':input[name="colorize"]' => ['checked' => TRUE],
