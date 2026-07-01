@@ -14,6 +14,17 @@ INSTALLATION
 Install as you would normally install a contributed Drupal module. Visit
 https://www.drupal.org/node/1897420 for further information.
 
+DRUSH COMMANDS
+--------------
+
+`neo:color:schemes` (alias `neoc-schemes`) — list the enabled color schemes: id,
+label, CSS selector, and whether each is dark/colorized. Supports `--format=json`
+for machine parsing.
+
+```bash
+drush neo:color:schemes
+```
+
 ## Pallet Shades
 
 Each pallet has the following shades:
