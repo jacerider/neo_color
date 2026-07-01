@@ -1,6 +1,6 @@
 uuid: 6c7d551b-5179-44c9-a328-c9e82060dae8
 langcode: en
-status: true
+status: false
 dependencies: {  }
 id: primary_solid_light
 label: 'Primary Solid Light'

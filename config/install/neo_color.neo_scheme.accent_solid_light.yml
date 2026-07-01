@@ -1,6 +1,6 @@
 uuid: 4c095f6b-ace0-4f2d-bae9-d0210de50484
 langcode: en
-status: true
+status: false
 dependencies: {  }
 id: accent_solid_light
 label: 'Accent Solid Light'

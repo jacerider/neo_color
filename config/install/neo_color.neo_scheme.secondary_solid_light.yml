@@ -1,6 +1,6 @@
 uuid: c4bf39bc-fefb-45ca-986c-8682777eae68
 langcode: en
-status: true
+status: false
 dependencies: {  }
 id: secondary_solid_light
 label: 'Secondary Solid Light'
