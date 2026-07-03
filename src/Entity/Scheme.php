@@ -241,6 +241,27 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
         $css['--btn-line-color'] = static::pickLineColor($shades, $surfaces, $lightHex, $darkHex, $preferredHex, $tonal);
       }
     }
+    // Re-pin the bare --color-{role} tokens (text-primary, bg-secondary,
+    // border-accent, and their hover: variants) so plain color utilities stay
+    // legible when a scheme is wrapped around them. These default to the role's
+    // 500 brand shade; on schemes where 500 has little or no contrast against
+    // the surface — colorized schemes at a low offset, or any scheme mapping a
+    // role to the same pallet as base — that shade *is* the surface, so
+    // text-primary turns invisible and bg-primary vanishes into the background.
+    // Walk to the nearest-to-500 shade that clears text-grade contrast (4.5:1,
+    // the strictest use, so both text and fill stay legible) and move its
+    // content pair with it so bg-{role} + text-{role}-content keeps working. In
+    // ordinary schemes 500 already clears the target, so the token is left
+    // unchanged. Base is intentionally excluded: bg-base is a subtle surface
+    // step, not a contrast element, and text-base is a font size, not a color.
+    foreach (['primary', 'secondary', 'accent'] as $slot) {
+      if (!isset($slotShades[$slot])) {
+        continue;
+      }
+      [$pick] = static::pickButtonShades($slotShades[$slot], $surfaces, FALSE, 4.5);
+      $css["--color-$slot"] = implode(' ', $pick->getRgb());
+      $css["--color-$slot-content"] = implode(' ', $pick->getContentRgb());
+    }
     // Links are colored *text* on the scheme surface, so they get a
     // text-grade (4.5:1) pick from the primary slot ramp rather than the bare
     // --color-primary token (the 500 brand shade), which can sit on — or be —
