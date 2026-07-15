@@ -239,11 +239,18 @@ class Shade {
     };
     $lightRatio = $ratio($bgLum, self::relativeLuminance($lightHex));
     $darkRatio = $ratio($bgLum, self::relativeLuminance($darkHex));
-    // Bias toward light text: only choose dark when it is clearly the more
-    // readable option (>10%). On saturated brand surfaces light and dark text
-    // are near-equal contrast; the bias keeps the conventional light text there,
-    // while genuinely light surfaces (where dark wins decisively) still get dark.
-    return $darkRatio > $lightRatio * 1.1
+    // Bias toward light text, scaled by the fill's chroma (colorfulness).
+    // WCAG relative luminance under-weights saturated warm hues: a vivid
+    // brand red like #ee3124 scores as "dark" (luminance ~0.205, just past
+    // the ~0.179 black/white crossover), so raw contrast slightly prefers
+    // dark ink even though light ink is conventional and perceptually
+    // correct on it. The more saturated the fill, the stronger the lean to
+    // light; a near-neutral surface keeps the ~10% baseline and follows raw
+    // contrast, so genuinely light surfaces still get dark ink.
+    [$r, $g, $b] = sscanf($bgHex, "#%02x%02x%02x");
+    $chroma = (max($r, $g, $b) - min($r, $g, $b)) / 255;
+    $bias = 1.1 + 0.45 * $chroma;
+    return $darkRatio > $lightRatio * $bias
       ? ['hex' => $darkHex, 'dark' => TRUE]
       : ['hex' => $lightHex, 'dark' => FALSE];
   }
