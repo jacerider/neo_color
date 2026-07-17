@@ -19,8 +19,9 @@ Two config entities feed one CSS-variable system:
   legible on it). Pallets are scheme-agnostic.
 - **`neo_scheme`** — maps the four **roles** (`base`, `primary`, `secondary`,
   `accent` — `SchemeInterface::PALLETS`) each to a pallet id, plus flags `dark`
-  (bool), `colorize` (bool), `colorize_offset` (int 0–200, default 100). Its
-  selector is `scheme-{id-with-dashes}` (`getSelector()`).
+  (bool), `colorize` (bool), `colorize_offset` (int 0–200, default 100), and a
+  per-role `{role}_contrast` flag (bool, default TRUE) on primary/secondary/
+  accent. Its selector is `scheme-{id-with-dashes}` (`getSelector()`).
 
 A scheme emits a block of CSS custom properties scoped to `.scheme-{id}`. Wrapping
 markup in that class remaps every `--color-*` token, so plain Tailwind color
@@ -60,7 +61,10 @@ scheme. `base` is the **surface** family; `primary/secondary/accent` are accents
   `--color-border-default`) per scheme scope *and* in `.scheme--reset`.
 - `Form/{SchemeForm,PalletForm}.php`, `Element/{Scheme,Color}.php` — admin UI (scheme
   editor + preview, pallet editor, the scheme radio element). `Drush/Commands/
-  NeoColorCommands.php` — `neo:color:schemes` (alias `neoc-schemes`) lists schemes.
+  NeoColorCommands.php` — the introspection commands: `neo:color:pallets` (`neoc-pallets`),
+  `neo:color:schemes` (`neoc-schemes`, role→pallet mapping + resolved surface/text), and
+  `neo:color:scheme <id>` (`neoc-scheme`, one scheme resolved to hex; `--vars` for the full
+  `getCssData()` dump). All take `--format=json`.
 
 ## Token cheat-sheet (read before touching color)
 
@@ -101,12 +105,15 @@ Key rule: **`base` is excluded** from the bare-token contrast pick (bg-base is a
 surface step, not a contrast element; `text-base` is a font size, not a color).
 Numbered shades (`--color-primary-500`) always stay the raw brand — only the bare
 token and its `-content` move. Where a role's 500 already clears the target, the
-pick returns 500 and nothing changes.
+pick returns 500 and nothing changes. Switching a role's `{role}_contrast` flag
+off in the scheme form pins its bare token and button fill to the raw 500 (hover
+still steps; links and `--btn-line-color` stay picked — they render as text).
 
 ## The contrast-pick engine
 
 `pickButtonShades($shades, $surfaces, $tonal = FALSE, $contrastTarget = 4.0)`
-returns `[$pick, $hover]`:
+(default is `Scheme::BUTTON_CONTRAST_TARGET`; a `0.0` target pins the pick to 500,
+which is how auto-contrast-off slots are implemented) returns `[$pick, $hover]`:
 - Walks the *preferred side* from 500 away from the surface tone (dark-reversed
   ramps make this "toward higher shade ids"). Accepts the first shade ≥ target.
 - Fallbacks in order: best shade that is ≥ 2.0 **against base-0 only** (the guard is
@@ -148,6 +155,10 @@ $d = $s->getCssData();                    // every emitted --color-* / --btn-* /
 ```
 `drush php:script ./_audit.php` then `rm` it. This is how you verify a pick change
 across *all* schemes (loop `loadByProperties(['status'=>1])`) before rebuilding.
+
+For a quick resolved-value read without a script, `drush neo:color:scheme <id> --vars --format=json`
+dumps the same `getCssData()` set (curated hex tokens at the top level, the full raw ramp
+under `vars`). The script is still the tool for *contrast math* and cross-scheme loops.
 
 ## Dev workflow gotchas
 
