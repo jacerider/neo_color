@@ -54,11 +54,23 @@ use Drupal\neo_color\Shade;
  *     "primary",
  *     "secondary",
  *     "accent",
+ *     "primary_contrast",
+ *     "secondary_contrast",
+ *     "accent_contrast",
  *     "weight",
  *   },
  * )
  */
 final class Scheme extends ConfigEntityBase implements SchemeInterface {
+
+  /**
+   * The contrast target a button fill must clear against the surfaces.
+   *
+   * Brand fidelity is a per-scheme decision, not an engine heuristic: a
+   * scheme that wants a role's exact 500 color switches that role's
+   * {role}_contrast flag off rather than this target being loosened.
+   */
+  public const BUTTON_CONTRAST_TARGET = 4.0;
 
   /**
    * The scheme ID.
@@ -104,6 +116,28 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    * The accent pallet.
    */
   protected string $accent = 'accent';
+
+  /**
+   * Whether the primary role auto-contrasts against the scheme surface.
+   *
+   * TRUE (default) lets the pick engine nudge the role's bare token and
+   * button fill to a legible shade; FALSE pins them to the raw 500.
+   */
+  protected bool $primary_contrast = TRUE;
+
+  /**
+   * Whether the secondary role auto-contrasts against the scheme surface.
+   *
+   * @see $primary_contrast
+   */
+  protected bool $secondary_contrast = TRUE;
+
+  /**
+   * Whether the accent role auto-contrasts against the scheme surface.
+   *
+   * @see $primary_contrast
+   */
+  protected bool $accent_contrast = TRUE;
 
   /**
    * The scheme weight.
@@ -182,7 +216,11 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
     // colorized surface now follows the mode (light/dark) like a normal scheme,
     // so this gives dark buttons on light schemes and light buttons on dark
     // schemes for colorized and non-colorized alike — consistent everywhere.
-    foreach (static::buildButtonCssVars($slotShades, $pallets) as $key => $value) {
+    $contrast = [];
+    foreach (['primary', 'secondary', 'accent'] as $slot) {
+      $contrast[$slot] = (bool) $this->get($slot . '_contrast');
+    }
+    foreach (static::buildButtonCssVars($slotShades, $pallets, FALSE, $contrast) as $key => $value) {
       $css[$key] = $value;
     }
     return $css;
@@ -198,7 +236,9 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    * color can be tonally identical to the surface itself. Instead, pick the
    * shade nearest 500 that clears a 4:1 contrast ratio against the scheme's
    * surfaces (base-0 and base-100) — keeping the hue while guaranteeing that
-   * solid buttons stand off the surface and outline/text buttons stay legible.
+   * solid buttons stand off the surface and outline/text buttons stay
+   * legible. Schemes that want a role's exact brand color opt out per role
+   * via the {role}_contrast flags rather than a looser global target.
    *
    * @param array $slotShades
    *   Transformed shade ramps keyed by slot (base, primary, secondary, accent).
@@ -210,11 +250,17 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    *   sibling schemes read predictably. The base slot is exempt — its scaled
    *   ramp's far end already matches the scheme tone, so the default walk is
    *   tonal for it by construction.
+   * @param array $contrast
+   *   Auto-contrast flags keyed by slot; a missing slot defaults to TRUE.
+   *   FALSE pins the slot's bare --color-{slot} token and button fill to the
+   *   raw 500 shade. Links and outline/text buttons stay contrast-picked
+   *   regardless — they render as text, where pinning could ship unreadable
+   *   pages.
    *
    * @return array
    *   CSS variable key/value pairs.
    */
-  public static function buildButtonCssVars(array $slotShades, array $pallets, bool $tonal = FALSE): array {
+  public static function buildButtonCssVars(array $slotShades, array $pallets, bool $tonal = FALSE, array $contrast = []): array {
     $css = [];
     if (!isset($slotShades['base'])) {
       return $css;
@@ -224,7 +270,11 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
       $slotShades['base'][100]->getHex(),
     ];
     foreach ($slotShades as $slot => $shades) {
-      [$pick, $hover] = static::pickButtonShades($shades, $surfaces, $tonal && $slot !== 'base');
+      // A pinned slot (auto-contrast off) passes a 0.0 target: the walk
+      // accepts 500 immediately while the hover step still runs, so hover
+      // feedback survives pinning.
+      $target = ($contrast[$slot] ?? TRUE) ? self::BUTTON_CONTRAST_TARGET : 0.0;
+      [$pick, $hover] = static::pickButtonShades($shades, $surfaces, $tonal && $slot !== 'base', $target);
       $lightHex = $pallets[$slot]->getContentLightHex();
       $darkHex = $pallets[$slot]->getContentDarkHex();
       $prefix = $slot === 'base' ? '--btn' : "--btn-$slot";
@@ -254,11 +304,17 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
     // ordinary schemes 500 already clears the target, so the token is left
     // unchanged. Base is intentionally excluded: bg-base is a subtle surface
     // step, not a contrast element, and text-base is a font size, not a color.
+    // A scheme can opt a role out via its {role}_contrast flag, pinning the
+    // pair to the raw 500 — a designer decision made against the scheme
+    // form's live preview.
     foreach (['primary', 'secondary', 'accent'] as $slot) {
       if (!isset($slotShades[$slot])) {
         continue;
       }
-      [$pick] = static::pickButtonShades($slotShades[$slot], $surfaces, FALSE, 4.5);
+      $pick = $slotShades[$slot][500];
+      if ($contrast[$slot] ?? TRUE) {
+        [$pick] = static::pickButtonShades($slotShades[$slot], $surfaces, FALSE, 4.5);
+      }
       $css["--color-$slot"] = implode(' ', $pick->getRgb());
       $css["--color-$slot-content"] = implode(' ', $pick->getContentRgb());
     }
@@ -369,7 +425,7 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    * Pick the button and button-hover shades for a ramp against surfaces.
    *
    * Walks the preferred side of the ramp from 500 outward and returns the
-   * first shade clearing 4:1 against every surface, or the best
+   * first shade clearing the contrast target against every surface, or the best
    * preferred-side shade when it is at least visible (2:1). Only when the
    * preferred side is invisible does it consider the other side, and finally
    * the overall best.
@@ -390,14 +446,15 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    * @param bool $tonal
    *   TRUE to prefer the scheme-tone side of the ramp (colorized slots).
    * @param float $contrastTarget
-   *   The contrast ratio a shade must clear to be picked. 4.0 (default) is
-   *   UI-component grade for button fills; use 4.5 for text-grade picks such
-   *   as link colors.
+   *   The contrast ratio a shade must clear to be picked. The default
+   *   BUTTON_CONTRAST_TARGET (4.0) is fill-grade for solid buttons; use 4.5
+   *   for text-grade picks such as link colors, or 0.0 to pin the pick to
+   *   500 (auto-contrast off).
    *
    * @return \Drupal\neo_color\Shade[]
    *   A two-element array: the picked shade and the hover shade.
    */
-  protected static function pickButtonShades(array $shades, array $surfaces, bool $tonal = FALSE, float $contrastTarget = 4.0): array {
+  protected static function pickButtonShades(array $shades, array $surfaces, bool $tonal = FALSE, float $contrastTarget = self::BUTTON_CONTRAST_TARGET): array {
     $ramp = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
     $minContrast = function (int $shadeId) use ($shades, $surfaces): float {
       $min = NULL;

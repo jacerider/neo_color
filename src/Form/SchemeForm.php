@@ -95,7 +95,7 @@ final class SchemeForm extends EntityForm {
       '#max' => 200,
       '#step' => 5,
       '#default_value' => (int) ($this->entity->get('colorize_offset') ?? 100),
-      '#description' => $this->t('How far the surface is tinted away from the base pallet\'s <em>500</em> color. <em>0</em> keeps the surface at the exact <em>500</em> color; <em>100</em> is the full light/dark tint; <em>200</em> pushes all the way to a pure white (light) / black (dark) surface. At low values, default borders and base buttons intentionally converge toward the surface color.'),
+      '#description' => $this->t("How far the surface is tinted away from the base pallet's <em>500</em> color. <em>0</em> keeps the surface at the exact <em>500</em> color; <em>100</em> is the full light/dark tint; <em>200</em> pushes all the way to a pure white (light) / black (dark) surface. At low values, default borders and base buttons intentionally converge toward the surface color."),
       '#states' => [
         'visible' => [
           ':input[name="colorize"]' => ['checked' => TRUE],
@@ -132,6 +132,18 @@ final class SchemeForm extends EntityForm {
           '#neo_pallet' => $pallets[$this->entity->get($key)],
         ],
       ];
+      if ($key !== 'base') {
+        $form[$key . '_contrast'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Auto-contrast'),
+          '#default_value' => (bool) $this->entity->get($key . '_contrast'),
+          '#description' => $this->t("Nudge this color to a legible shade wherever the pallet's <em>500</em> lacks contrast against this scheme's surface. Disable to always use the exact <em>500</em> color for buttons and bare color utilities (<em>bg/text/border</em>) — links and outline buttons stay contrast-protected either way."),
+          '#ajax' => [
+            'callback' => '::ajaxCallback',
+            'wrapper' => 'neo-scheme',
+          ],
+        ];
+      }
     }
 
     return $form;
