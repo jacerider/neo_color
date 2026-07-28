@@ -111,6 +111,22 @@ final class SchemeForm extends EntityForm {
       ],
     ];
 
+    $form['colorize_natural'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Natural saturation'),
+      '#default_value' => (bool) $this->entity->get('colorize_natural'),
+      '#description' => $this->t("Take each shade's saturation from the base pallet's own ramp instead of from its <em>500</em> color. Leave this off for a brand pallet, whose saturation is even across the ramp. Turn it on when the base pallet is a neutral with a saturated dark end — its light shades are meant to read as near-gray, and the <em>500</em> anchor would tint them."),
+      '#states' => [
+        'visible' => [
+          ':input[name="colorize"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#ajax' => [
+        'callback' => '::ajaxCallback',
+        'wrapper' => 'neo-scheme',
+      ],
+    ];
+
     foreach ([
       'base' => $this->t('Base Pallet'),
       'primary' => $this->t('Primary Pallet'),

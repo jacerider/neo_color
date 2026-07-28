@@ -19,9 +19,10 @@ Two config entities feed one CSS-variable system:
   legible on it). Pallets are scheme-agnostic.
 - **`neo_scheme`** — maps the four **roles** (`base`, `primary`, `secondary`,
   `accent` — `SchemeInterface::PALLETS`) each to a pallet id, plus flags `dark`
-  (bool), `colorize` (bool), `colorize_offset` (int 0–200, default 100), and a
-  per-role `{role}_contrast` flag (bool, default TRUE) on primary/secondary/
-  accent. Its selector is `scheme-{id-with-dashes}` (`getSelector()`).
+  (bool), `colorize` (bool), `colorize_offset` (int 0–200, default 100),
+  `colorize_natural` (bool, default FALSE), and a per-role `{role}_contrast`
+  flag (bool, default TRUE) on primary/secondary/accent. Its selector is
+  `scheme-{id-with-dashes}` (`getSelector()`).
 
 A scheme emits a block of CSS custom properties scoped to `.scheme-{id}`. Wrapping
 markup in that class remaps every `--color-*` token, so plain Tailwind color
@@ -36,6 +37,17 @@ scheme. `base` is the **surface** family; `primary/secondary/accent` are accents
   `colorize_offset`: 0 = surface is the *exact* brand 500; 100 = full tint; 100–200
   = tint → pure white (light) / black (dark). Role slots (primary/secondary/accent)
   use their raw dark-transformed pallet ramp — they are **not** colorized.
+- **colorize_natural** → changes *where the chroma comes from*. Off (default),
+  every colorized shade is painted with 500's hue and saturation, floored at 45%
+  so the surface still reads as the brand. On, each shade samples hue/saturation
+  from the pallet's own lightness→chroma curve (`Pallet::getChromaCurve()` /
+  `sampleChroma()`) at its target lightness. Hue is near-constant within a pallet,
+  so **saturation is the only thing this really moves**. It is a no-op for a brand
+  pallet (flat saturation across the ramp → sample == anchor) and only matters for
+  a pallet authored as a *neutral with a saturated dark end* (light shades ~10%
+  saturation against a 38% 500), where the anchor would tint an intended near-gray
+  surface. Self-consistent at offset 0: `$surfaceL == $brandL`, so the sample lands
+  on 500 itself.
 
 ## Where things live (`src/`)
 

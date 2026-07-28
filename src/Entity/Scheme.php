@@ -50,6 +50,7 @@ use Drupal\neo_color\Shade;
  *     "dark",
  *     "colorize",
  *     "colorize_offset",
+ *     "colorize_natural",
  *     "base",
  *     "primary",
  *     "secondary",
@@ -96,6 +97,26 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
    * @var int
    */
   protected $colorize_offset = 100;
+
+  /**
+   * Whether the colorized surface follows the base pallet's own saturation.
+   *
+   * Colorize normally paints the whole base ramp with shade 500's hue and
+   * saturation, floored at 45% so the surface still reads as the brand. That
+   * is right for a brand pallet, whose saturation is flat across the ramp, but
+   * it overrides a pallet authored as a neutral with a saturated dark end —
+   * base's light shades sit near 10% saturation against a 38% 500, so the
+   * anchor turns an intended near-gray surface into a visible tint.
+   *
+   * TRUE samples each shade's hue and saturation from the pallet's own
+   * lightness→chroma curve instead, keeping the ramp true to the colors the
+   * pallet actually defines. Brand pallets are unaffected: with a flat
+   * saturation curve the sample and the anchor agree. Only meaningful when
+   * colorize is enabled.
+   *
+   * @var bool
+   */
+  protected $colorize_natural = FALSE;
 
   /**
    * The base pallet.
@@ -202,15 +223,16 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
     $isDark = $this->get('dark');
     $isColor = $this->get('colorize');
     $offset = (int) ($this->get('colorize_offset') ?? 100);
+    $natural = (bool) $this->get('colorize_natural');
     $slotShades = [];
     foreach ($pallets as $id => $pallet) {
       $isBase = $id === 'base';
       $swap = !$isBase && $isColor && $pallets['base']->id() === $pallet->id();
-      $palletCss = $pallet->getCssData($id, $isDark, $isColor, $swap, $offset);
+      $palletCss = $pallet->getCssData($id, $isDark, $isColor, $swap, $offset, $natural);
       foreach ($palletCss as $key => $value) {
         $css[$key] = $value;
       }
-      $slotShades[$id] = $pallet->getTransformedShades($isDark, $isColor && $isBase, $offset);
+      $slotShades[$id] = $pallet->getTransformedShades($isDark, $isColor && $isBase, $offset, $natural);
     }
     // Buttons always pick by contrast against the surface (non-tonal). The
     // colorized surface now follows the mode (light/dark) like a normal scheme,

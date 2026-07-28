@@ -224,10 +224,10 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100):array {
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100, bool $naturalSaturation = FALSE):array {
     $css = [];
     $id = $id ?? $this->id();
-    $shades = $this->getTransformedShades($dark, $color && $id === 'base', $colorizeOffset);
+    $shades = $this->getTransformedShades($dark, $color && $id === 'base', $colorizeOffset, $naturalSaturation);
     $shadowHsl = $id === 'base' ? $this->getShadowAnchorHsl($shades) : NULL;
     // Luminance of the scheme surface (base-0). Shadows are clamped to stay
     // darker than this so a shadow never lightens the surface it falls on.
@@ -388,13 +388,13 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100): array {
+  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100, bool $naturalSaturation = FALSE): array {
     $shades = $this->getShades();
     if ($dark) {
       $shades = $this->reverseShades($shades);
     }
     if ($scale) {
-      $shades = $this->scaleShades($shades, $dark, $colorizeOffset);
+      $shades = $this->scaleShades($shades, $dark, $colorizeOffset, $naturalSaturation);
     }
     // Normalize to integer keys (getShades() uses string keys, the transform
     // maps use integers) so callers can address shades numerically.
@@ -478,11 +478,15 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
    * @param int $colorizeOffset
    *   How far the surface is tinted away from the brand 500 shade. 0-100 spans
    *   exact-500 → full tint; 100-200 spans full tint → pure white/black.
+   * @param bool $naturalSaturation
+   *   TRUE to take each shade's hue and saturation from the pallet's own
+   *   lightness→chroma curve instead of painting the whole ramp with the 500
+   *   anchor and its saturation floor. See getChromaCurve().
    *
    * @return \Drupal\neo_color\Shade[]
    *   The scaled shades.
    */
-  protected function scaleShades(array $shades, bool $dark = FALSE, int $colorizeOffset = 100): array {
+  protected function scaleShades(array $shades, bool $dark = FALSE, int $colorizeOffset = 100, bool $naturalSaturation = FALSE): array {
     $scaled = [];
     $lightHex = $this->getContentLightHex();
     $darkHex = $this->getContentDarkHex();
@@ -491,6 +495,9 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     $factor = max(0, $colorizeOffset) / 100;
     $brandL = $anchor['l'] / 100;
     $brandSat = $anchor['s'] / 100;
+    // Natural saturation resolves hue/saturation per shade from the pallet's
+    // own ramp rather than from the 500 anchor below.
+    $curve = $naturalSaturation ? $this->getChromaCurve() : NULL;
     // Keep the brand's saturation, but never so washed that the surface stops
     // reading as the brand color. The floor fades out as the offset approaches
     // 0 so the anchored surface matches the brand's true saturation; it stops
@@ -531,7 +538,8 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
         $hex = $shades[500]->getHex();
       }
       else {
-        [$r, $g, $b] = $this->hslToRgb($hue, $sat, $targetL);
+        [$shadeHue, $shadeSat] = $curve ? $this->sampleChroma($curve, $targetL) : [$hue, $sat];
+        [$r, $g, $b] = $this->hslToRgb($shadeHue, $shadeSat, $targetL);
         $hex = sprintf('#%02x%02x%02x', $r, $g, $b);
       }
       // Content follows the mode on the surface side of the ramp: dark
@@ -554,6 +562,85 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       $scaled[(int) $shadeId] = new Shade((string) $shadeId, $hex, $content['hex'], $content['dark']);
     }
     return $scaled;
+  }
+
+  /**
+   * Build the pallet's lightness → chroma curve.
+   *
+   * Colorize normally paints the whole ramp with shade 500's hue and
+   * saturation. That works for a brand pallet, whose saturation is flat across
+   * the ramp, but misreads a pallet designed as a neutral with a saturated
+   * dark end: base's light shades sit near 10% saturation while its 500 sits
+   * at 38%, so anchoring to 500 turns a near-gray surface into a visible tint.
+   *
+   * The curve records each configured shade as a (lightness, hue, saturation)
+   * point, sorted by lightness, so a colorized shade can look up the chroma
+   * the pallet's author actually chose at that lightness. Hue is carried along
+   * too, but is effectively constant within a pallet — saturation is the
+   * variable this exists to preserve.
+   *
+   * The synthetic white shade 0 is included on purpose: it is what lets the
+   * >100 colorize offsets desaturate smoothly into a pure white surface.
+   *
+   * @return array[]
+   *   Points with 'l' (0-1), 'h' (degrees) and 's' (0-1) keys, ascending by
+   *   lightness.
+   */
+  protected function getChromaCurve(): array {
+    $points = [];
+    foreach ($this->getShades() as $shade) {
+      $hsl = $shade->getHsl();
+      $points[] = [
+        'l' => $hsl['l'] / 100,
+        'h' => (float) $hsl['h'],
+        's' => $hsl['s'] / 100,
+      ];
+    }
+    usort($points, fn(array $a, array $b) => $a['l'] <=> $b['l']);
+    return $points;
+  }
+
+  /**
+   * Sample hue and saturation from a chroma curve at a target lightness.
+   *
+   * Linearly interpolates between the two shades bracketing the lightness.
+   * Beyond either end of the ramp the nearest endpoint is held.
+   *
+   * @param array[] $points
+   *   The curve from getChromaCurve().
+   * @param float $lightness
+   *   The target lightness (0-1).
+   *
+   * @return array
+   *   A [hue, saturation] pair, hue in degrees and saturation 0-1.
+   */
+  protected function sampleChroma(array $points, float $lightness): array {
+    $first = reset($points);
+    if ($lightness <= $first['l']) {
+      return [$first['h'], $first['s']];
+    }
+    $last = end($points);
+    if ($lightness >= $last['l']) {
+      return [$last['h'], $last['s']];
+    }
+    $count = count($points);
+    for ($i = 0; $i < $count - 1; $i++) {
+      $a = $points[$i];
+      $b = $points[$i + 1];
+      if ($lightness < $a['l'] || $lightness > $b['l']) {
+        continue;
+      }
+      $span = $b['l'] - $a['l'];
+      $ratio = $span > 0 ? ($lightness - $a['l']) / $span : 0.0;
+      // Walk the shortest arc so a ramp straddling 0° (secondary runs 358° →
+      // 0°) interpolates across the seam instead of sweeping the whole wheel.
+      $delta = fmod($b['h'] - $a['h'] + 540, 360) - 180;
+      return [
+        $a['h'] + $ratio * $delta,
+        $a['s'] + $ratio * ($b['s'] - $a['s']),
+      ];
+    }
+    return [$last['h'], $last['s']];
   }
 
   /**

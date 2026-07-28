@@ -119,11 +119,16 @@ interface PalletInterface extends ConfigEntityInterface {
    *   How far the colorized surface is tinted away from the brand 500 shade
    *   (0-100). 0 anchors the surface at the exact 500 color; 100 is the full
    *   light/dark tint. Only used when $scale is TRUE.
+   * @param bool $naturalSaturation
+   *   If TRUE, each colorized shade takes its hue and saturation from the
+   *   pallet's own lightness→chroma curve instead of from the 500 anchor, so a
+   *   pallet designed as a neutral keeps its neutral light end. Only used when
+   *   $scale is TRUE.
    *
    * @return \Drupal\neo_color\Shade[]
    *   The transformed shades, keyed by integer shade id (0-950).
    */
-  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100): array;
+  public function getTransformedShades(bool $dark = FALSE, bool $scale = FALSE, int $colorizeOffset = 100, bool $naturalSaturation = FALSE): array;
 
   /**
    * Get a shade.
@@ -215,10 +220,15 @@ interface PalletInterface extends ConfigEntityInterface {
    *   How far the colorized surface is tinted away from the brand 500 shade
    *   (0-100). 0 anchors the surface at the exact 500 color; 100 is the full
    *   light/dark tint. Only used when $color is TRUE.
+   * @param bool $naturalSaturation
+   *   If TRUE, each colorized shade takes its hue and saturation from the
+   *   pallet's own lightness→chroma curve instead of from the 500 anchor, so a
+   *   pallet designed as a neutral keeps its neutral light end. Only used when
+   *   $color is TRUE.
    *
    * @return array
    *   The css.
    */
-  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100):array;
+  public function getCssData($id = NULL, $dark = FALSE, $color = FALSE, $swap = FALSE, int $colorizeOffset = 100, bool $naturalSaturation = FALSE):array;
 
 }

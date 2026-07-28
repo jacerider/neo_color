@@ -162,6 +162,9 @@ neo_color.neo_scheme.*:
     colorize_offset:
       type: integer
       label: 'Colorize offset'
+    colorize_natural:
+      type: boolean
+      label: 'Natural saturation'
     base:
       type: string
       label: 'Base Pallet'
