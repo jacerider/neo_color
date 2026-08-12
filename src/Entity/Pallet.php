@@ -237,6 +237,13 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
     // (brand-tinted light/dark surface), so the brand tokens need no special
     // casing — bg-primary is the vivid brand on every scheme.
     $defaultShade = 500;
+    // The `--color-$id-hover` step defaults to 600 — the classic Tailwind
+    // rest/hover pairing — so hover:text-{pallet}-hover always resolves.
+    // Schemes re-pin the pair for the primary/secondary/accent role slots via
+    // Scheme::buildButtonCssVars() (a contrast-picked hover that steps away
+    // from the picked rest shade); this ramp default covers :root and any
+    // pallet the pick engine does not manage.
+    $hoverShade = 600;
     foreach ($shades as $shadeId => $shade) {
       $rgb = implode(' ', $shade->getRgb());
       $rgbContent = implode(' ', $shade->getContentRgb());
@@ -245,6 +252,10 @@ final class Pallet extends ConfigEntityBase implements PalletInterface {
       if ($shadeId === $defaultShade) {
         $css["--color-$id"] = $rgb;
         $css["--color-$id-content"] = $rgbContent;
+      }
+      if ($shadeId === $hoverShade) {
+        $css["--color-$id-hover"] = $rgb;
+        $css["--color-$id-hover-content"] = $rgbContent;
       }
       if ($id === 'base') {
         $css["--color-shadow-$shadeId"] = $this->getShadowRgb($shade, $shadowHsl, $surfaceLum);

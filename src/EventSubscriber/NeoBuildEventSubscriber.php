@@ -47,10 +47,26 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     $collection->addTailwindThemeItem('--color-white-content', 'rgb(var(--color-base-950))');
     $collection->addTailwindThemeItem('--color-black', 'rgb(var(--color-base-950))');
     $collection->addTailwindThemeItem('--color-black-content', 'rgb(var(--color-base-0))');
+    // Explicit link tokens: the `link` / `link-hover` theme colors (used as
+    // text-/bg-/border- utilities, with a hover: prefix on the latter) color
+    // any element like a scheme link. The vars are the text-grade (4.5:1)
+    // contrast picks every scheme emits — the same pair the base-layer bare
+    // `a` rule reads — and they stay picked even on schemes that pin a role's
+    // {role}_contrast off, which pins bare text-primary to the raw 500. The
+    // fallbacks reproduce the classic primary-600/800 pairing outside any
+    // scheme scope, mirroring neo_base's base.css.
+    $collection->addTailwindThemeItem('--color-link', 'var(--link-color, rgb(var(--color-primary-600)))');
+    $collection->addTailwindThemeItem('--color-link-hover', 'var(--link-color-hover, rgb(var(--color-primary-800)))');
     foreach ($pallets as $pallet) {
       $id = $pallet->id();
       $theme['colors'][$id]['DEFAULT'] = "rgb(var(--color-$id))";
       $theme['colors'][$id . '-content']['DEFAULT'] = "rgb(var(--color-$id-content))";
+      // The adaptive hover step for the bare token: `hover:text-{id}-hover`
+      // replaces the non-adaptive `hover:text-{id}-600`. Ramp default is 600
+      // (Pallet::getCssData()); schemes re-pin primary/secondary/accent to a
+      // contrast-picked step (Scheme::buildButtonCssVars()).
+      $theme['colors'][$id . '-hover']['DEFAULT'] = "rgb(var(--color-$id-hover))";
+      $theme['colors'][$id . '-hover-content']['DEFAULT'] = "rgb(var(--color-$id-hover-content))";
       foreach ($pallet->getShades() as $shadeId => $shade) {
         $theme['colors'][$id][$shadeId] = "rgb(var(--color-$id-$shadeId))";
         $theme['colors'][$id][$shadeId . '-content'] = "rgb(var(--color-$id-$shadeId-content))";
@@ -60,8 +76,8 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
       }
     }
 
-    // Fall back the Tailwind "gray" family scales to "base" when their pallet is
-    // not enabled, so components copied from the internet (which commonly use
+    // Fall back the Tailwind "gray" family scales to "base" when their
+    // pallet is not enabled, so components copied from the internet (which use
     // gray/slate/zinc/neutral/stone) render against the standardized base
     // palette. base is scheme-scoped, so these aliases are scheme-reactive too.
     // An enabled pallet of the same name keeps its own colors (isset guard).

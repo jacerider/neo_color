@@ -329,16 +329,24 @@ final class Scheme extends ConfigEntityBase implements SchemeInterface {
     // A scheme can opt a role out via its {role}_contrast flag, pinning the
     // pair to the raw 500 — a designer decision made against the scheme
     // form's live preview.
+    //
+    // --color-{role}-hover is the adaptive replacement for the hardcoded
+    // hover:text-{role}-600 idiom (numbered shades never adapt): the next
+    // perceptibly different step along the same walk, so
+    // `text-{role}` + `hover:text-{role}-hover` stays a working pair in
+    // every scheme. Pinned roles pass a 0.0 target — the walk accepts 500
+    // immediately while the hover step still runs — mirroring the button
+    // pins above, so hover feedback survives {role}_contrast being off.
     foreach (['primary', 'secondary', 'accent'] as $slot) {
       if (!isset($slotShades[$slot])) {
         continue;
       }
-      $pick = $slotShades[$slot][500];
-      if ($contrast[$slot] ?? TRUE) {
-        [$pick] = static::pickButtonShades($slotShades[$slot], $surfaces, FALSE, 4.5);
-      }
+      $target = ($contrast[$slot] ?? TRUE) ? 4.5 : 0.0;
+      [$pick, $hover] = static::pickButtonShades($slotShades[$slot], $surfaces, FALSE, $target);
       $css["--color-$slot"] = implode(' ', $pick->getRgb());
       $css["--color-$slot-content"] = implode(' ', $pick->getContentRgb());
+      $css["--color-$slot-hover"] = implode(' ', $hover->getRgb());
+      $css["--color-$slot-hover-content"] = implode(' ', $hover->getContentRgb());
     }
     // Links are colored *text* on the scheme surface, so they get a
     // text-grade (4.5:1) pick from the primary slot ramp rather than the bare

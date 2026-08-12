@@ -108,6 +108,7 @@ surface so they never collide with it):
 | Token(s) | Purpose | Target |
 |---|---|---|
 | `--color-{primary,secondary,accent}` (+ `-content`) | make bare `text-/bg-/border-{role}` legible in every scheme | 4.5:1 |
+| `--color-{role}-hover` (+ `-hover-content`) | the bare token's adaptive hover step (`hover:text-{role}-hover`) — replaces the non-adaptive `hover:text-{role}-600` idiom | ≥1.2 delta from the pick |
 | `--btn[-slot]-bg-color` / `-content-color` (+ `-hover`) | solid button fills + their ink | 4.0:1 |
 | `--btn-line-color` | outline/text-button ink (text-grade) | 4.5:1 |
 | `--link-color` / `--link-color-hover` | link ink + its hover step | 4.5:1 |
@@ -116,10 +117,18 @@ surface so they never collide with it):
 Key rule: **`base` is excluded** from the bare-token contrast pick (bg-base is a
 surface step, not a contrast element; `text-base` is a font size, not a color).
 Numbered shades (`--color-primary-500`) always stay the raw brand — only the bare
-token and its `-content` move. Where a role's 500 already clears the target, the
-pick returns 500 and nothing changes. Switching a role's `{role}_contrast` flag
-off in the scheme form pins its bare token and button fill to the raw 500 (hover
-still steps; links and `--btn-line-color` stay picked — they render as text).
+token, its `-content`, and its `-hover` pair move. Where a role's 500 already
+clears the target, the pick returns 500 and nothing changes. Switching a role's
+`{role}_contrast` flag off in the scheme form pins its bare token and button fill
+to the raw 500 (hover still steps — buttons, links, and the bare-token `-hover`
+alike; links and `--btn-line-color` stay picked — they render as text).
+
+Tailwind exposure (`NeoBuildEventSubscriber::onBuild()`): every pallet registers
+`{pallet}-hover` / `{pallet}-hover-content` colors (ramp default `--color-{id}-hover`
+= shade 600, emitted by `Pallet::getCssData()` so the utility resolves at `:root`;
+schemes re-pin the three roles via `buildButtonCssVars()`), plus `link` /
+`link-hover` (`var(--link-color[-hover])` with primary-600/800 fallbacks outside
+scheme scope, mirroring neo_base's bare-`a` rule).
 
 ## The contrast-pick engine
 
