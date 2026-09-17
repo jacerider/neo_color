@@ -23,7 +23,10 @@ function neo_color_theme(): array {
       'variables' => ['neo_scheme' => NULL],
     ],
     'neo_scheme_swatch' => [
-      'variables' => ['neo_scheme' => NULL],
+      // `label` is passed directly for the "None" option, which has no scheme
+      // to read one from; template_preprocess_neo_scheme_swatch() fills it in
+      // for every real scheme.
+      'variables' => ['neo_scheme' => NULL, 'label' => NULL],
     ],
   ];
 }

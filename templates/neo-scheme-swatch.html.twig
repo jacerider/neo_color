@@ -2,8 +2,8 @@
 /**
  * @file
  * Compact scheme swatch for form radios: the scheme's surface with its default
- * text pairing ("Aa"), and three separated dots for the primary / secondary /
- * accent colors.
+ * text pairing ("Aa"), three separated dots for the primary / secondary /
+ * accent colors, and the scheme's name.
  *
  * Dots show each slot's recognizable brand hue (the scheme-scoped -500 shade)
  * so a scheme reads as "olive / brown / red" at a glance. They are NOT filled
@@ -12,16 +12,42 @@
  * Visibility instead comes from a ring in the surface's own text color
  * (--text-color-default, always legible against the surface), so a dot stays a
  * distinct chip even when its hue happens to match the surface.
+ *
+ * The name takes its color from the tile rather than setting one: the tile
+ * fills with the primary color once selected (`form-item-border` brings that
+ * with it), and a name that pinned its own muted gray would be left sitting
+ * unreadable on top of the fill. The "Aa" inside the surface is unaffected —
+ * that sets its own color, because it has to show the scheme's own pairing.
+ *
+ * The name is drawn rather than left to a tooltip. Six coloured tiles are not
+ * tellable apart by looking, and the element renders as `grid_tiles`, whose
+ * label is the whole control — so there is nothing left beside the tile to
+ * carry a name. It sits *outside* the tinted surface: inside, it would have to
+ * be legible against every scheme's background, and the scheme being chosen is
+ * exactly the thing that varies.
+ *
+ * With no scheme this is the "None" option, which keeps the same silhouette so
+ * the row stays even — an unfilled surface and three hollow dots.
  */
 #}
 {% set dot = 'h-3.5 w-3.5 rounded-full border' %}
-{% set ring = 'border-color: color-mix(in oklab, var(--text-color-default) 60%, transparent)' %}
 {% set ring = 'border-color: rgb(var(--color-base-0-content))' %}
-<div class="neo-schemes-swatch {{ selector }} flex w-20 flex-col items-center gap-2 rounded-md border border-shadow-300 bg-base-0 p-2 text-base-0-content" title="{{ label }}">
-  <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
-  <div class="flex items-center gap-1.5">
-    <span class="{{ dot }}" style="background-color: rgb(var(--color-primary-500)); {{ ring }}"></span>
-    <span class="{{ dot }}" style="background-color: rgb(var(--color-secondary-500)); {{ ring }}"></span>
-    <span class="{{ dot }}" style="background-color: rgb(var(--color-accent-500)); {{ ring }}"></span>
+<div class="neo-schemes-swatch flex w-full flex-col items-center gap-1">
+  <div class="{{ neo_scheme ? selector }} flex w-full flex-col items-center gap-2 rounded-md border {{ neo_scheme ? 'border-shadow-300 bg-base-0 text-base-0-content' : 'border-base-300 bg-base-0 text-base-400' }} p-2">
+    <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
+    <div class="flex items-center gap-1.5">
+      {% if neo_scheme %}
+        <span class="{{ dot }}" style="background-color: rgb(var(--color-primary-500)); {{ ring }}"></span>
+        <span class="{{ dot }}" style="background-color: rgb(var(--color-secondary-500)); {{ ring }}"></span>
+        <span class="{{ dot }}" style="background-color: rgb(var(--color-accent-500)); {{ ring }}"></span>
+      {% else %}
+        <span class="{{ dot }} border-base-300 bg-base-100"></span>
+        <span class="{{ dot }} border-base-300 bg-base-100"></span>
+        <span class="{{ dot }} border-base-300 bg-base-100"></span>
+      {% endif %}
+    </div>
   </div>
+  {% if label %}
+    <span class="w-full text-center text-3xs leading-tight">{{ label }}</span>
+  {% endif %}
 </div>

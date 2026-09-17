@@ -135,28 +135,19 @@ final class Scheme extends FormElementBase {
     }
     $schemeOptions = [];
     if (!$required && !$multiple) {
+      // Rendered through the same template as a real scheme rather than a
+      // second copy of its markup: the two drifted apart every time the swatch
+      // changed, because nothing tied them together.
       $schemeOptions[''] = [
-        '#type' => 'inline_template',
-        '#template' => '
-        <div class="neo-schemes-swatch flex w-20 flex-col items-center gap-2 rounded-md border border-base-300 bg-base-0 p-2 text-base-400" title="{{ id }}">
-          <div class="text-xl leading-none"><span class="font-bold">A</span>a</div>
-          <div class="flex items-center gap-1.5">
-            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
-            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
-            <span class="h-3.5 w-3.5 rounded-full border border-base-300 bg-base-100"></span>
-          </div>
-        </div>
-        ',
-        '#context' => [
-          'id' => $element['#empty_option'] ?? t('None'),
-        ],
+        '#theme' => 'neo_scheme_swatch',
+        '#neo_scheme' => NULL,
+        '#label' => $element['#empty_option'] ?? t('None'),
       ];
     }
     foreach ($schemes as $scheme) {
       $schemeOptions[$scheme->id()] = [
         '#theme' => 'neo_scheme_swatch',
         '#neo_scheme' => $scheme,
-        '#tooltip' => $scheme->label(),
       ];
     }
 
@@ -166,9 +157,15 @@ final class Scheme extends FormElementBase {
       'elementValidate',
     ]);
 
+    // `grid_tiles`, not `inline_elements`: the latter keeps the radio visible
+    // beside its label, which left every swatch trailing a 20px control that
+    // duplicated what the tile already says by being selected. The tile is the
+    // control now — and `grid_tiles` rings it when checked rather than filling
+    // it, because a swatch carries the very colours being chosen and a fill
+    // would paint over them.
     $element['scheme'] = [
       '#type' => $element['#multiple'] ? 'checkboxes' : 'radios',
-      '#neo_style' => 'inline_elements',
+      '#neo_style' => 'grid_tiles',
       '#options' => $schemeOptions,
       '#required' => !empty($element['#required']),
       '#default_value' => $defaultValue,
